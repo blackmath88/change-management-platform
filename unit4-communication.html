@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 4 · Communicate with Impact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0d2d6e;--blue:#1a56db;--blue-dk:#1244b8;--blue-lt:#e8eefb;
+  --text:#0f1623;--body:#3a4460;--muted:#7a8aaa;--rule:#dde3f0;
+  --bg:#f4f6fb;--surface:#ffffff;--bg-grey:#eef1f8;
+  --support:#1a7a3a;--support-lt:#e4f4ea;
+  --resist:#c0392b;--resist-lt:#fde8e8;
+  --amber:#b45309;--amber-lt:#fef3c7;
+  --teal:#0e7490;--teal-lt:#e0f2fe;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);z-index:50;}
+.nav-left{display:flex;align-items:center;gap:0.75rem;}
+.nav-back{font-size:0.73rem;color:rgba(255,255,255,0.38);text-decoration:none;transition:color 0.2s;font-weight:500;}
+.nav-back:hover{color:rgba(255,255,255,0.7);}
+.nav-sep{width:1px;height:13px;background:rgba(255,255,255,0.15);}
+.nav-title{font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.75);}
+.nav-project{font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.28);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:0.75rem;}
+.nav-unit{font-family:var(--mono);font-size:0.63rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:100px;background:rgba(14,116,144,0.25);color:rgba(100,210,230,0.7);border:1px solid rgba(14,116,144,0.3);}
+.save-indicator{font-family:var(--mono);font-size:0.62rem;color:rgba(255,255,255,0.25);transition:color 0.3s;}
+.save-indicator.saving{color:rgba(255,200,0,0.6);}
+.save-indicator.saved{color:rgba(100,220,130,0.7);}
+
+.tabbar{background:var(--surface);border-bottom:1px solid var(--rule);display:flex;align-items:stretch;flex-shrink:0;padding:0 1.5rem;overflow-x:auto;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-btn{display:flex;align-items:center;gap:0.5rem;padding:0 1.1rem;height:44px;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-num{font-family:var(--mono);font-size:0.65rem;font-weight:600;width:18px;height:18px;border-radius:50%;background:var(--bg-grey);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.tab-btn.active .tab-num{background:var(--blue-lt);color:var(--blue);}
+
+.workspace{flex:1;display:flex;min-height:0;overflow:hidden;}
+.content{flex:1;overflow-y:auto;min-height:0;}
+.pane{display:none;}
+.pane.active{display:block;}
+.wrap{max-width:900px;margin:0 auto;padding:2rem 2rem 4rem;}
+
+.pane-head{margin-bottom:1.75rem;}
+.pane-eyebrow{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem;}
+.pane-eyebrow::before{content:'';display:block;width:16px;height:2px;background:var(--teal);border-radius:1px;}
+.pane-title{font-size:1.2rem;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pane-desc{font-size:0.82rem;color:var(--body);line-height:1.65;max-width:580px;}
+
+.label{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.35rem;display:block;}
+.field-input,.field-textarea{font-family:var(--sans);font-size:0.84rem;color:var(--text);background:var(--surface);border:1.5px solid var(--rule);padding:0.6rem 0.8rem;outline:none;transition:border-color 0.15s;border-radius:6px;width:100%;}
+.field-input:focus,.field-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--muted);}
+.field-textarea{resize:vertical;min-height:70px;line-height:1.6;}
+.field-group{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.85rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+
+.hint-box{background:var(--blue-lt);border:1px solid rgba(26,86,219,0.15);border-radius:8px;padding:0.9rem 1.1rem;font-size:0.79rem;color:var(--body);line-height:1.6;margin-bottom:1.25rem;}
+.hint-box strong{color:var(--navy);}
+.hint-box.teal{background:var(--teal-lt);border-color:rgba(14,116,144,0.2);}
+.hint-box.teal strong{color:var(--teal);}
+.hint-box.amber{background:var(--amber-lt);border-color:rgba(180,83,9,0.15);}
+.hint-box.amber strong{color:var(--amber);}
+.divider{height:1px;background:var(--rule);margin:1.5rem 0;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:7px;font-family:var(--sans);font-size:0.8rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;text-decoration:none;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--blue-dk);}
+.btn-secondary{background:var(--bg-grey);color:var(--body);border:1.5px solid var(--rule);}
+.btn-secondary:hover{background:var(--blue-lt);color:var(--blue);border-color:var(--blue);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:#0a2258;}
+.btn-sm{padding:0.38rem 0.85rem;font-size:0.73rem;border-radius:6px;}
+.btn.copied{background:var(--support);color:#fff;}
+
+/* ── CORE MESSAGE BLOCK ── */
+.core-message-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.core-block{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1.1rem 1.25rem;}
+.core-block-num{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--rule);line-height:1;margin-bottom:0.4rem;}
+.core-block-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.3rem;}
+.core-block-desc{font-size:0.72rem;color:var(--muted);line-height:1.5;margin-bottom:0.6rem;}
+
+/* ── KFD CARDS ── */
+.kfd-section{margin-bottom:1.5rem;}
+.kfd-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;}
+.kfd-section-title{font-size:0.9rem;font-weight:700;color:var(--navy);}
+.audience-tabs{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.aud-tab{font-size:0.72rem;font-weight:600;padding:0.28rem 0.7rem;border-radius:100px;border:1.5px solid var(--rule);background:none;color:var(--muted);cursor:pointer;transition:all 0.12s;}
+.aud-tab:hover{border-color:var(--blue);color:var(--blue);}
+.aud-tab.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+.kfd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+.kfd-card{border-radius:10px;padding:1.1rem 1.25rem;}
+.kfd-know{background:#f0f9ff;border:1.5px solid #bae6fd;}
+.kfd-feel{background:#fdf4ff;border:1.5px solid #e9d5ff;}
+.kfd-do{background:var(--support-lt);border:1.5px solid #bbf7d0;}
+.kfd-badge{display:inline-block;font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:3px;margin-bottom:0.5rem;}
+.kfd-know .kfd-badge{background:#bae6fd;color:#0369a1;}
+.kfd-feel .kfd-badge{background:#e9d5ff;color:#7c3aed;}
+.kfd-do .kfd-badge{background:#bbf7d0;color:#15803d;}
+.kfd-card-title{font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:0.3rem;}
+.kfd-card-desc{font-size:0.7rem;color:var(--muted);line-height:1.5;margin-bottom:0.6rem;}
+
+/* ── AUDIENCE CARDS ── */
+.audience-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1.25rem;margin-bottom:0.85rem;}
+.audience-card-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;}
+.audience-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.62rem;font-weight:700;color:#fff;flex-shrink:0;}
+.audience-name{font-size:0.9rem;font-weight:700;color:var(--navy);}
+.audience-source{font-size:0.7rem;color:var(--muted);}
+.from-stakeholder{font-family:var(--mono);font-size:0.6rem;padding:0.15rem 0.45rem;background:var(--blue-lt);color:var(--blue);border-radius:3px;margin-left:0.4rem;}
+
+/* ── MISFIRE PATTERNS ── */
+.misfire-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;}
+.misfire-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:9px;padding:1rem 1.1rem;cursor:pointer;transition:all 0.15s;}
+.misfire-card:hover{border-color:var(--amber);}
+.misfire-card.flagged{background:var(--amber-lt);border-color:var(--amber);}
+.misfire-icon{font-size:1.2rem;margin-bottom:0.35rem;}
+.misfire-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+.misfire-desc{font-size:0.73rem;color:var(--body);line-height:1.5;}
+.misfire-card.flagged .misfire-title::after{content:' ⚑';color:var(--amber);}
+
+/* ── AI PANE ── */
+.prompt-box{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;}
+.prompt-box-head{padding:0.85rem 1.25rem;background:var(--bg-grey);border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;}
+.prompt-box-label{font-family:var(--mono);font-size:0.7rem;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+.prompt-text{font-family:var(--mono);font-size:0.72rem;color:var(--body);padding:1.25rem;line-height:1.7;white-space:pre-wrap;max-height:320px;overflow-y:auto;}
+.prompt-actions{padding:1rem 1.25rem;border-top:1px solid var(--rule);display:flex;gap:0.75rem;flex-wrap:wrap;}
+.ai-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;}
+.ai-mode-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:8px;padding:0.9rem 1.1rem;cursor:pointer;transition:all 0.15s;}
+.ai-mode-card:hover{border-color:var(--blue);}
+.ai-mode-card.active{border-color:var(--blue);background:var(--blue-lt);}
+.ai-mode-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+.ai-mode-desc{font-size:0.72rem;color:var(--body);line-height:1.45;}
+
+.next-unit{background:var(--navy);border-radius:10px;padding:1.5rem 2rem;margin-top:2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.next-unit-text{color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.5;}
+.next-unit-text strong{color:#fff;display:block;font-size:0.95rem;margin-bottom:0.2rem;}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:500;padding:0.65rem 1.1rem;border-radius:7px;box-shadow:0 8px 24px rgba(10,20,50,0.2);transform:translateY(60px);opacity:0;transition:all 0.2s;z-index:200;}
+.toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-back">← Projects</a>
+    <div class="nav-sep"></div>
+    <div class="nav-title">Communicate with Impact</div>
+    <div class="nav-sep"></div>
+    <div class="nav-project" id="nav-project">Loading…</div>
+  </div>
+  <div class="nav-right">
+    <span class="save-indicator" id="save-indicator">—</span>
+    <div class="nav-unit">Unit 4 of 5</div>
+  </div>
+</nav>
+
+<div class="tabbar">
+  <button class="tab-btn active" onclick="switchTab('core',this)"><span class="tab-num">1</span> Core Message</button>
+  <button class="tab-btn" onclick="switchTab('audiences',this)"><span class="tab-num">2</span> Audiences</button>
+  <button class="tab-btn" onclick="switchTab('risks',this)"><span class="tab-num">3</span> Risks</button>
+  <button class="tab-btn" onclick="switchTab('ai',this)"><span class="tab-num">4</span> AI &amp; Export</button>
+</div>
+
+<div class="workspace"><div class="content">
+
+<!-- ══ TAB 1: CORE MESSAGE ══ -->
+<div class="pane active" id="pane-core">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 4 · Core Message</div>
+    <div class="pane-title">What is the one truth this change must communicate?</div>
+    <div class="pane-desc">Before adapting for audiences, define the core message architecture. Every audience-specific version will be a translation of this — same truth, different emphasis and language.</div>
+  </div>
+
+  <div id="vision-carry" class="hint-box teal" style="display:none;">
+    <strong>From your vision:</strong> <span id="vision-carry-text"></span>
+  </div>
+
+  <div class="core-message-grid">
+    <div class="core-block">
+      <div class="core-block-num">01</div>
+      <div class="core-block-title">The problem</div>
+      <div class="core-block-desc">What is the current situation that makes this change necessary?</div>
+      <textarea class="field-textarea" id="core-problem" style="min-height:80px;" placeholder="e.g. Administrative work is document-heavy and repetitive, and AI tools are being used informally without support…" oninput="autosave()"></textarea>
+    </div>
+    <div class="core-block">
+      <div class="core-block-num">02</div>
+      <div class="core-block-title">The solution</div>
+      <div class="core-block-desc">What is the change, stated simply and without jargon?</div>
+      <textarea class="field-textarea" id="core-solution" style="min-height:80px;" placeholder="e.g. We are introducing Copilot as a supported, governed tool for selected administrative tasks…" oninput="autosave()"></textarea>
+    </div>
+    <div class="core-block">
+      <div class="core-block-num">03</div>
+      <div class="core-block-title">The impact</div>
+      <div class="core-block-desc">What will be different and better for the people involved?</div>
+      <textarea class="field-textarea" id="core-impact" style="min-height:80px;" placeholder="e.g. Staff will save time on recurring tasks and have more space for meaningful, human work…" oninput="autosave()"></textarea>
+    </div>
+    <div class="core-block">
+      <div class="core-block-num">04</div>
+      <div class="core-block-title">The outlook</div>
+      <div class="core-block-desc">What happens next? What is the path forward?</div>
+      <textarea class="field-textarea" id="core-outlook" style="min-height:80px;" placeholder="e.g. We begin with a small supported pilot, collect feedback, and adapt before any wider rollout…" oninput="autosave()"></textarea>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label class="label">Communication objective — what must this change as a whole achieve?</label>
+    <div class="kfd-grid" style="margin-top:0.35rem;">
+      <div class="kfd-card kfd-know">
+        <div class="kfd-badge">Know</div>
+        <div class="kfd-card-title">What must people understand?</div>
+        <div class="kfd-card-desc">The rational insight everyone must walk away with.</div>
+        <textarea class="field-textarea" id="obj-know" style="background:transparent;border-color:rgba(3,105,161,0.2);min-height:60px;" placeholder="e.g. Copilot is being introduced in a limited, supported way — not a forced rollout." oninput="autosave()"></textarea>
+      </div>
+      <div class="kfd-card kfd-feel">
+        <div class="kfd-badge">Feel</div>
+        <div class="kfd-card-title">What emotional shift is needed?</div>
+        <div class="kfd-card-desc">From anxiety/uncertainty toward…</div>
+        <textarea class="field-textarea" id="obj-feel" style="background:transparent;border-color:rgba(124,58,237,0.2);min-height:60px;" placeholder="e.g. Cautiously curious and reassured that this is manageable." oninput="autosave()"></textarea>
+      </div>
+      <div class="kfd-card kfd-do">
+        <div class="kfd-badge">Do</div>
+        <div class="kfd-card-title">What should people do next?</div>
+        <div class="kfd-card-desc">One concrete action or behaviour.</div>
+        <textarea class="field-textarea" id="obj-do" style="background:transparent;border-color:rgba(21,128,61,0.2);min-height:60px;" placeholder="e.g. Join the pilot, ask questions, engage with the support formats." oninput="autosave()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-top:0.5rem;">
+    <button class="btn btn-primary" onclick="switchTab('audiences',document.querySelectorAll('.tab-btn')[1])">Audience Translations →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 2: AUDIENCES ══ -->
+<div class="pane" id="pane-audiences">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 4 · Audience Translations</div>
+    <div class="pane-title">Same truth, different language</div>
+    <div class="pane-desc">Each audience has a different relationship to the change. Translate the core message into their language, their concerns, and their call to action.</div>
+  </div>
+
+  <div id="stakeholder-carry" class="hint-box teal" style="display:none;">
+    <strong>Your stakeholders from Unit 3</strong> have been pre-loaded as audiences below. Add know/feel/do for each.
+  </div>
+
+  <div id="audience-list">
+    <div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.82rem;">Loading audiences from Unit 3…</div>
+  </div>
+
+  <button class="btn btn-secondary btn-sm" onclick="addCustomAudience()" style="margin-top:0.5rem;">+ Add custom audience</button>
+
+  <div style="display:flex;justify-content:space-between;margin-top:1.5rem;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="switchTab('core',document.querySelectorAll('.tab-btn')[0])">← Core Message</button>
+    <button class="btn btn-primary" onclick="switchTab('risks',document.querySelectorAll('.tab-btn')[2])">Risks →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 3: RISKS ══ -->
+<div class="pane" id="pane-risks">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 4 · Communication Risks</div>
+    <div class="pane-title">What could go wrong?</div>
+    <div class="pane-desc">Most communication failures are predictable. Flag the patterns you recognise in your current approach — before they damage trust.</div>
+  </div>
+
+  <div class="hint-box amber">
+    <strong>Communication misfires are predictable.</strong> They're caused by a small set of recurring patterns. Spotting them early is far cheaper than recovering from them.
+  </div>
+
+  <div class="misfire-grid" id="misfire-grid">
+    <!-- Injected by JS -->
+  </div>
+
+  <div class="field-group">
+    <label class="label">Your biggest communication risk for this initiative</label>
+    <textarea class="field-textarea" id="comms-risk-notes" placeholder="What specific misfire are you most worried about, and why? What would you do to prevent it?" style="min-height:90px;" oninput="autosave()"></textarea>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="switchTab('audiences',document.querySelectorAll('.tab-btn')[1])">← Audiences</button>
+    <button class="btn btn-primary" onclick="switchTab('ai',document.querySelectorAll('.tab-btn')[3])">AI &amp; Export →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 4: AI ══ -->
+<div class="pane" id="pane-ai">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 4 · AI &amp; Export</div>
+    <div class="pane-title">Take your communication plan to an AI thinking partner</div>
+    <div class="pane-desc">Your full context, core message, and audience translations are embedded automatically.</div>
+  </div>
+  <div class="ai-mode-grid">
+    <div class="ai-mode-card active" onclick="setMode('strengthen',this)">
+      <div class="ai-mode-title">✍️ Strengthen the message</div>
+      <div class="ai-mode-desc">Make the core message sharper, more memorable, and harder to misunderstand.</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('audience',this)">
+      <div class="ai-mode-title">🎯 Audience check</div>
+      <div class="ai-mode-desc">For each audience, is the know/feel/do specific enough? What's missing or too vague?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('objections',this)">
+      <div class="ai-mode-title">🛡️ Anticipate objections</div>
+      <div class="ai-mode-desc">What are the most likely objections to each audience message, and how should you respond?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('nudge',this)">
+      <div class="ai-mode-title">⚡ Bridge to nudges</div>
+      <div class="ai-mode-desc">Based on the know/feel/do gaps, what behavioural interventions make sense for Unit 5?</div>
+    </div>
+  </div>
+  <div class="prompt-box">
+    <div class="prompt-box-head">
+      <span class="prompt-box-label">Generated prompt</span>
+    </div>
+    <div class="prompt-text" id="prompt-output">Fill in Tabs 1–3 to generate a prompt.</div>
+    <div class="prompt-actions">
+      <button class="btn btn-navy" id="btn-copy" onclick="copyPrompt(this)">Copy prompt</button>
+      <a class="btn btn-secondary" href="https://claude.ai" target="_blank" onclick="softCopy()">Open Claude ↗</a>
+      <a class="btn btn-secondary" href="https://chat.openai.com" target="_blank" onclick="softCopy()">Open ChatGPT ↗</a>
+    </div>
+  </div>
+  <div class="next-unit">
+    <div class="next-unit-text">
+      <strong>Ready for Unit 5?</strong>
+      Communication creates awareness. Now design the interventions that actually change behaviour.
+    </div>
+    <a href="unit5-nudges.html" class="btn btn-primary" id="next-link">Unit 5: Nudge &amp; Momentum →</a>
+  </div>
+</div>
+</div>
+
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+let projectId  = null;
+let activeMode = 'strengthen';
+let saveTimer  = null;
+let vision     = {};
+let stakeholdersData = { stakeholders: [] };
+
+const COLORS = ['#1a56db','#1a7a3a','#7c3aed','#b45309','#0e7490','#c0392b','#0891b2'];
+
+const MISFIRES = [
+  { icon:'🌫️', title:'Too abstract', desc:'The message talks about strategy without connecting to what changes concretely for this specific audience.' },
+  { icon:'📢', title:'One-size-fits-all', desc:'The same message sent to all audiences without translation. Never lands for anyone.' },
+  { icon:'🎙️', title:'Leadership-centric', desc:'Framed entirely from the organisation\'s perspective — not what it means for the audience personally.' },
+  { icon:'🔇', title:'Silent on the loss', desc:'Focuses on benefits without acknowledging what people are giving up or what is genuinely uncertain.' },
+  { icon:'⚡', title:'Announced, not built', desc:'Communicated once and assumed understood. No follow-through, repetition, or feedback loop.' },
+  { icon:'🌀', title:'Ambiguity left open', desc:'Key questions about roles, timelines, or job security left unanswered. Filled by rumour.' },
+  { icon:'⏱️', title:'Wrong timing', desc:'Communicated before people are ready to hear it, or so late that rumours have already spread.' },
+  { icon:'🎭', title:'Tone-deaf', desc:'The tone doesn\'t match the emotional reality of the audience — too upbeat when people are anxious.' },
+];
+
+let data = {
+  core_problem:'', core_solution:'', core_impact:'', core_outlook:'',
+  obj_know:'', obj_feel:'', obj_do:'',
+  audiences: [],
+  comms_risk_notes:'',
+  flagged_misfires: [],
+};
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  projectId = params.get('project') || localStorage.getItem('cmt_current_project');
+
+  if (projectId) {
+    const projects = JSON.parse(localStorage.getItem('cmt_projects') || '[]');
+    const p = projects.find(p => p.id === projectId);
+    if (p) document.getElementById('nav-project').textContent = p.title;
+
+    const vRaw = localStorage.getItem(`cmt_module_${projectId}_vision`);
+    if (vRaw) {
+      vision = JSON.parse(vRaw);
+      const vtext = vision.vision_statement || vision.ctx_title;
+      if (vtext) {
+        document.getElementById('vision-carry-text').textContent = vtext;
+        document.getElementById('vision-carry').style.display = 'block';
+      }
+      // Pre-fill core message from vision if empty
+    }
+
+    const shRaw = localStorage.getItem(`cmt_module_${projectId}_stakeholders`);
+    if (shRaw) stakeholdersData = JSON.parse(shRaw);
+
+    const saved = localStorage.getItem(`cmt_module_${projectId}_communication`);
+    if (saved) {
+      try { data = { ...data, ...JSON.parse(saved) }; } catch(e) {}
+    }
+
+    document.getElementById('next-link').href = `unit5-nudges.html?project=${projectId}`;
+  }
+
+  // Populate core fields
+  setField('core-problem', data.core_problem);
+  setField('core-solution', data.core_solution);
+  setField('core-impact', data.core_impact);
+  setField('core-outlook', data.core_outlook);
+  setField('obj-know', data.obj_know);
+  setField('obj-feel', data.obj_feel);
+  setField('obj-do', data.obj_do);
+  if (data.comms_risk_notes) setField('comms-risk-notes', data.comms_risk_notes);
+
+  // Seed audiences from stakeholders if none saved
+  if (!data.audiences.length && stakeholdersData.stakeholders?.length) {
+    data.audiences = stakeholdersData.stakeholders.map((s,i) => ({
+      id: uid(),
+      name: s.name || 'Unnamed',
+      source_stakeholder_id: s.id,
+      color: COLORS[i % COLORS.length],
+      know: '', feel: '', do: '', tone: '', notes: '',
+    }));
+    document.getElementById('stakeholder-carry').style.display = 'block';
+  }
+
+  renderAudiences();
+  renderMisfires();
+}
+
+// ── AUDIENCES ─────────────────────────────────────────────────
+function renderAudiences() {
+  const list = document.getElementById('audience-list');
+  if (!data.audiences.length) {
+    list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.82rem;">No audiences yet. Add stakeholders in Unit 3 or add a custom audience below.</div>';
+    return;
+  }
+  list.innerHTML = data.audiences.map((aud,i) => {
+    const sh = stakeholdersData.stakeholders?.find(s => s.id === aud.source_stakeholder_id);
+    const initials = (aud.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    return `
+      <div class="audience-card">
+        <div class="audience-card-header">
+          <div class="audience-avatar" style="background:${aud.color}">${initials}</div>
+          <div>
+            <div class="audience-name">${esc(aud.name)}${aud.source_stakeholder_id?'<span class="from-stakeholder">from Unit 3</span>':''}</div>
+            ${sh ? `<div class="audience-source">${esc(sh.role||sh.group||'')}</div>` : ''}
+          </div>
+          <div style="margin-left:auto;">
+            <button class="btn btn-sm" style="background:var(--resist-lt);color:var(--resist);border:1px solid rgba(192,57,43,0.2);" onclick="removeAudience(${i})">Remove</button>
+          </div>
+        </div>
+        <div class="kfd-grid">
+          <div class="kfd-card kfd-know">
+            <div class="kfd-badge">Know</div>
+            <div class="kfd-card-title">What must they understand?</div>
+            <textarea class="field-textarea" style="background:transparent;border-color:rgba(3,105,161,0.2);min-height:70px;" placeholder="The rational insight they must walk away with…" oninput="updateAudience(${i},'know',this.value)">${esc(aud.know)}</textarea>
+          </div>
+          <div class="kfd-card kfd-feel">
+            <div class="kfd-badge">Feel</div>
+            <div class="kfd-card-title">What shift do they need?</div>
+            <textarea class="field-textarea" style="background:transparent;border-color:rgba(124,58,237,0.2);min-height:70px;" placeholder="From [current emotional state] toward [desired state]…" oninput="updateAudience(${i},'feel',this.value)">${esc(aud.feel)}</textarea>
+          </div>
+          <div class="kfd-card kfd-do">
+            <div class="kfd-badge">Do</div>
+            <div class="kfd-card-title">What should they do next?</div>
+            <textarea class="field-textarea" style="background:transparent;border-color:rgba(21,128,61,0.2);min-height:70px;" placeholder="One specific, concrete action or commitment…" oninput="updateAudience(${i},'do',this.value)">${esc(aud.do)}</textarea>
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:0.75rem;">
+          <label class="label">Communication tone &amp; approach for this audience</label>
+          <input class="field-input" value="${esc(aud.tone)}" placeholder="e.g. Empathetic and practical. Lead with reassurance. Avoid jargon. Keep it short." oninput="updateAudience(${i},'tone',this.value)">
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateAudience(i, field, val) {
+  if (data.audiences[i]) { data.audiences[i][field] = val; autosave(); }
+}
+function removeAudience(i) {
+  data.audiences.splice(i,1); renderAudiences(); autosave();
+}
+function addCustomAudience() {
+  data.audiences.push({ id: uid(), name: 'New Audience', color: COLORS[data.audiences.length % COLORS.length], know:'', feel:'', do:'', tone:'', notes:'' });
+  renderAudiences(); autosave();
+}
+
+// ── MISFIRES ──────────────────────────────────────────────────
+function renderMisfires() {
+  const grid = document.getElementById('misfire-grid');
+  grid.innerHTML = MISFIRES.map((m,i) => `
+    <div class="misfire-card${data.flagged_misfires.includes(i)?' flagged':''}" onclick="toggleMisfire(${i})">
+      <div class="misfire-icon">${m.icon}</div>
+      <div class="misfire-title">${m.title}</div>
+      <div class="misfire-desc">${m.desc}</div>
+    </div>`).join('');
+}
+function toggleMisfire(i) {
+  const idx = data.flagged_misfires.indexOf(i);
+  if (idx >= 0) data.flagged_misfires.splice(idx,1); else data.flagged_misfires.push(i);
+  renderMisfires(); autosave();
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab === 'ai') updatePrompt();
+}
+
+// ── AUTOSAVE ──────────────────────────────────────────────────
+function autosave() {
+  data.core_problem  = val('core-problem');
+  data.core_solution = val('core-solution');
+  data.core_impact   = val('core-impact');
+  data.core_outlook  = val('core-outlook');
+  data.obj_know      = val('obj-know');
+  data.obj_feel      = val('obj-feel');
+  data.obj_do        = val('obj-do');
+  data.comms_risk_notes = val('comms-risk-notes');
+
+  const ind = document.getElementById('save-indicator');
+  ind.textContent = 'Saving…'; ind.className = 'save-indicator saving';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(`cmt_module_${projectId}_communication`, JSON.stringify(data));
+    ind.textContent = 'Saved'; ind.className = 'save-indicator saved';
+    setTimeout(() => { ind.textContent = '—'; ind.className = 'save-indicator'; }, 2000);
+  }, 800);
+}
+
+// ── AI PROMPT ─────────────────────────────────────────────────
+function setMode(mode, card) {
+  activeMode = mode;
+  document.querySelectorAll('.ai-mode-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  updatePrompt();
+}
+
+function updatePrompt() {
+  const audText = data.audiences.map(a =>
+    `  ${a.name}:\n    Know: ${a.know||'not specified'}\n    Feel: ${a.feel||'not specified'}\n    Do: ${a.do||'not specified'}\n    Tone: ${a.tone||'not specified'}`
+  ).join('\n\n') || '  (no audiences defined)';
+
+  const flagged = data.flagged_misfires.map(i => MISFIRES[i]?.title).join(', ') || 'none flagged';
+
+  const base = `CHANGE MANAGEMENT CONTEXT — Unit 4: Communicate with Impact
+
+Initiative: ${vision.ctx_title||'(not set)'}
+Organisation: ${vision.ctx_org||'(not set)'}
+Vision: ${vision.vision_statement||'(not set)'}
+
+CORE MESSAGE:
+Problem: ${data.core_problem||'not specified'}
+Solution: ${data.core_solution||'not specified'}
+Impact: ${data.core_impact||'not specified'}
+Outlook: ${data.core_outlook||'not specified'}
+
+COMMUNICATION OBJECTIVE:
+Know: ${data.obj_know||'not specified'}
+Feel: ${data.obj_feel||'not specified'}
+Do: ${data.obj_do||'not specified'}
+
+AUDIENCE TRANSLATIONS:
+${audText}
+
+FLAGGED COMMUNICATION RISKS: ${flagged}`;
+
+  const modes = {
+    strengthen: `${base}
+
+TASK: Act as a communication strategist. Strengthen this change communication:
+1. Is the core message clear, memorable, and jargon-free? Suggest a sharper version.
+2. Does the know/feel/do objective create a complete and coherent shift? What is missing?
+3. Which part of the core message is most likely to be misheard or misunderstood? Why?
+4. Suggest one simple phrase or metaphor that could anchor this communication.`,
+
+    audience: `${base}
+
+TASK: Review the audience translations:
+1. For each audience, is the "know" specific enough to be actionable — or is it still abstract?
+2. For each audience, is the "feel" shift realistic given their current stance?
+3. Which audience's translation is weakest, and what would strengthen it?
+4. Are there any audiences missing that should be added based on this change context?`,
+
+    objections: `${base}
+
+TASK: Anticipate objections for each audience:
+For each defined audience:
+1. What is the most likely objection or question they will raise?
+2. Is this objection rational, emotional, or political?
+3. What is the best response — factual, empathetic, or involving?
+4. What should NOT be said to this audience — what would backfire?`,
+
+    nudge: `${base}
+
+TASK: Bridge communication design to behavioural intervention for Unit 5:
+1. For each audience, where is the "do" gap largest — what would make the desired action easier or more likely?
+2. Which audiences are most likely to hear the message but not change behaviour? Why?
+3. For the top 3 audiences, suggest one specific behavioural nudge that would reinforce the communication.
+4. What environmental or structural change would make the communication stick beyond the first message?`,
+  };
+
+  document.getElementById('prompt-output').textContent = modes[activeMode];
+}
+
+function copyPrompt(btn) {
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2500);
+  });
+}
+function softCopy() { navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).catch(()=>{}); }
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setField(id, v) { const el = document.getElementById(id); if (el && v) el.value = v; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+init();
+</script>
+</body>
+</html>

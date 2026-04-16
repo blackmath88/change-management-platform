@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 5 · Nudge &amp; Build Momentum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0d2d6e;--blue:#1a56db;--blue-dk:#1244b8;--blue-lt:#e8eefb;
+  --text:#0f1623;--body:#3a4460;--muted:#7a8aaa;--rule:#dde3f0;
+  --bg:#f4f6fb;--surface:#ffffff;--bg-grey:#eef1f8;
+  --support:#1a7a3a;--support-lt:#e4f4ea;
+  --resist:#c0392b;--resist-lt:#fde8e8;
+  --amber:#b45309;--amber-lt:#fef3c7;
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+  --east-easy:#0e7490;--east-easy-lt:#e0f2fe;
+  --east-attractive:#7c3aed;--east-attractive-lt:#ede9fe;
+  --east-social:#1a7a3a;--east-social-lt:#e4f4ea;
+  --east-timely:#b45309;--east-timely-lt:#fef3c7;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);z-index:50;}
+.nav-left{display:flex;align-items:center;gap:0.75rem;}
+.nav-back{font-size:0.73rem;color:rgba(255,255,255,0.38);text-decoration:none;transition:color 0.2s;font-weight:500;}
+.nav-back:hover{color:rgba(255,255,255,0.7);}
+.nav-sep{width:1px;height:13px;background:rgba(255,255,255,0.15);}
+.nav-title{font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.75);}
+.nav-project{font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.28);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:0.75rem;}
+.nav-unit{font-family:var(--mono);font-size:0.63rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:100px;background:rgba(26,122,58,0.25);color:rgba(100,220,130,0.7);border:1px solid rgba(26,122,58,0.3);}
+.save-indicator{font-family:var(--mono);font-size:0.62rem;color:rgba(255,255,255,0.25);transition:color 0.3s;}
+.save-indicator.saving{color:rgba(255,200,0,0.6);}
+.save-indicator.saved{color:rgba(100,220,130,0.7);}
+
+.tabbar{background:var(--surface);border-bottom:1px solid var(--rule);display:flex;align-items:stretch;flex-shrink:0;padding:0 1.5rem;overflow-x:auto;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-btn{display:flex;align-items:center;gap:0.5rem;padding:0 1.1rem;height:44px;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-num{font-family:var(--mono);font-size:0.65rem;font-weight:600;width:18px;height:18px;border-radius:50%;background:var(--bg-grey);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.tab-btn.active .tab-num{background:var(--blue-lt);color:var(--blue);}
+
+.workspace{flex:1;display:flex;min-height:0;overflow:hidden;}
+.content{flex:1;overflow-y:auto;min-height:0;}
+.pane{display:none;}
+.pane.active{display:block;}
+.wrap{max-width:960px;margin:0 auto;padding:2rem 2rem 4rem;}
+
+.pane-head{margin-bottom:1.75rem;}
+.pane-eyebrow{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--support);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem;}
+.pane-eyebrow::before{content:'';display:block;width:16px;height:2px;background:var(--support);border-radius:1px;}
+.pane-title{font-size:1.2rem;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pane-desc{font-size:0.82rem;color:var(--body);line-height:1.65;max-width:580px;}
+
+.label{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.35rem;display:block;}
+.field-input,.field-textarea{font-family:var(--sans);font-size:0.84rem;color:var(--text);background:var(--surface);border:1.5px solid var(--rule);padding:0.6rem 0.8rem;outline:none;transition:border-color 0.15s;border-radius:6px;width:100%;}
+.field-input:focus,.field-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--muted);}
+.field-textarea{resize:vertical;min-height:72px;line-height:1.6;}
+.field-group{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.85rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.85rem;}
+
+.hint-box{background:var(--blue-lt);border:1px solid rgba(26,86,219,0.15);border-radius:8px;padding:0.9rem 1.1rem;font-size:0.79rem;color:var(--body);line-height:1.6;margin-bottom:1.25rem;}
+.hint-box strong{color:var(--navy);}
+.hint-box.support{background:var(--support-lt);border-color:rgba(26,122,58,0.15);}
+.hint-box.support strong{color:var(--support);}
+.divider{height:1px;background:var(--rule);margin:1.5rem 0;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:7px;font-family:var(--sans);font-size:0.8rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;text-decoration:none;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--blue-dk);}
+.btn-secondary{background:var(--bg-grey);color:var(--body);border:1.5px solid var(--rule);}
+.btn-secondary:hover{background:var(--blue-lt);color:var(--blue);border-color:var(--blue);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:#0a2258;}
+.btn-sm{padding:0.38rem 0.85rem;font-size:0.73rem;border-radius:6px;}
+.btn.copied{background:var(--support);color:#fff;}
+
+/* ── ADOPTION STRIP ── */
+.adoption-strip{display:flex;gap:0;border-radius:7px;overflow:hidden;border:1.5px solid var(--rule);margin-bottom:0.75rem;}
+.adopt-step{flex:1;padding:0.6rem 0.3rem;text-align:center;font-size:0.65rem;font-weight:600;color:var(--muted);border-right:1px solid var(--rule);cursor:pointer;transition:all 0.15s;user-select:none;line-height:1.3;}
+.adopt-step:last-child{border-right:none;}
+.adopt-step:hover{background:var(--blue-lt);color:var(--blue);}
+.adopt-step.active{background:var(--navy);color:#fff;}
+.adopt-step.passed{background:var(--support-lt);color:var(--support);}
+.adopt-step.target{background:var(--blue-lt);color:var(--blue);border:2px dashed var(--blue);}
+
+/* ── EAST FRAMEWORK ── */
+.east-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.east-card{border-radius:10px;padding:1.1rem 1.25rem;border:1.5px solid transparent;}
+.east-easy{background:var(--east-easy-lt);border-color:rgba(14,116,144,0.2);}
+.east-attractive{background:var(--east-attractive-lt);border-color:rgba(124,58,237,0.2);}
+.east-social{background:var(--east-social-lt);border-color:rgba(26,122,58,0.2);}
+.east-timely{background:var(--east-timely-lt);border-color:rgba(180,83,9,0.2);}
+.east-badge{font-family:var(--mono);font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.35rem;display:block;}
+.east-easy .east-badge{color:var(--east-easy);}
+.east-attractive .east-badge{color:var(--east-attractive);}
+.east-social .east-badge{color:var(--east-social);}
+.east-timely .east-badge{color:var(--east-timely);}
+.east-card-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.25rem;}
+.east-card-desc{font-size:0.72rem;color:var(--body);line-height:1.5;}
+
+/* ── NUDGE CARDS ── */
+.nudge-list{display:flex;flex-direction:column;gap:0.85rem;margin-bottom:1rem;}
+.nudge-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1.1rem 1.25rem;transition:border-color 0.15s;}
+.nudge-card:hover{border-color:#b8c8e8;}
+.nudge-card-top{display:flex;align-items:center;gap:0.65rem;margin-bottom:0.85rem;}
+.east-type-badge{font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;flex-shrink:0;}
+.badge-easy{background:var(--east-easy-lt);color:var(--east-easy);}
+.badge-attractive{background:var(--east-attractive-lt);color:var(--east-attractive);}
+.badge-social{background:var(--east-social-lt);color:var(--east-social);}
+.badge-timely{background:var(--east-timely-lt);color:var(--east-timely);}
+.nudge-title-input{flex:1;font-family:var(--sans);font-size:0.85rem;font-weight:600;color:var(--text);border:none;background:transparent;outline:none;min-width:0;}
+.nudge-title-input::placeholder{color:var(--muted);font-weight:400;}
+.nudge-east-select{font-family:var(--mono);font-size:0.68rem;border:1.5px solid var(--rule);border-radius:5px;padding:0.25rem 0.5rem;background:var(--bg);cursor:pointer;color:var(--body);outline:none;}
+.nudge-east-select:focus{border-color:var(--blue);}
+.nudge-remove{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0 0.1rem;transition:color 0.12s;flex-shrink:0;}
+.nudge-remove:hover{color:var(--resist);}
+
+/* ── MOMENTUM ── */
+.momentum-wrap{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+.momentum-title{font-size:0.88rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+.momentum-score-display{font-family:var(--mono);font-size:1.3rem;font-weight:700;color:var(--support);text-align:center;margin-bottom:0.4rem;}
+.momentum-bar-track{height:10px;background:var(--rule);border-radius:5px;margin-bottom:0.5rem;overflow:hidden;}
+.momentum-bar-fill{height:100%;background:linear-gradient(90deg,var(--support),#22c55e);border-radius:5px;transition:width 0.4s;}
+.momentum-status{font-size:0.75rem;color:var(--muted);text-align:center;margin-bottom:1rem;}
+.momentum-signals{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.75rem;}
+.signal-row{display:flex;align-items:flex-start;gap:0.5rem;cursor:pointer;padding:0.35rem 0;}
+.signal-check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--rule);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.12s;margin-top:1px;}
+.signal-check.on{background:var(--support);border-color:var(--support);color:#fff;font-size:0.6rem;}
+.signal-text{font-size:0.75rem;color:var(--body);line-height:1.4;}
+
+/* ── COMPLETE ── */
+.complete-box{background:linear-gradient(135deg,var(--navy) 0%,#1a3a8a 100%);border-radius:12px;padding:2.5rem 2rem;margin-top:2rem;text-align:center;}
+.complete-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+.complete-title{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:0.5rem;}
+.complete-sub{font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.65;margin-bottom:1.5rem;max-width:480px;margin-left:auto;margin-right:auto;}
+.complete-actions{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;}
+
+/* ── AI PANE ── */
+.prompt-box{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;}
+.prompt-box-head{padding:0.85rem 1.25rem;background:var(--bg-grey);border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;}
+.prompt-box-label{font-family:var(--mono);font-size:0.7rem;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+.prompt-text{font-family:var(--mono);font-size:0.72rem;color:var(--body);padding:1.25rem;line-height:1.7;white-space:pre-wrap;max-height:340px;overflow-y:auto;}
+.prompt-actions{padding:1rem 1.25rem;border-top:1px solid var(--rule);display:flex;gap:0.75rem;flex-wrap:wrap;}
+.ai-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;}
+.ai-mode-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:8px;padding:0.9rem 1.1rem;cursor:pointer;transition:all 0.15s;}
+.ai-mode-card:hover{border-color:var(--blue);}
+.ai-mode-card.active{border-color:var(--blue);background:var(--blue-lt);}
+.ai-mode-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+.ai-mode-desc{font-size:0.72rem;color:var(--body);line-height:1.45;}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:500;padding:0.65rem 1.1rem;border-radius:7px;box-shadow:0 8px 24px rgba(10,20,50,0.2);transform:translateY(60px);opacity:0;transition:all 0.2s;z-index:200;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+@media(max-width:680px){
+  .east-grid{grid-template-columns:1fr;}
+  .grid-2{grid-template-columns:1fr;}
+  .grid-3{grid-template-columns:1fr;}
+  .momentum-signals{grid-template-columns:1fr;}
+  .ai-mode-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-back">← Projects</a>
+    <div class="nav-sep"></div>
+    <div class="nav-title">Nudge &amp; Build Momentum</div>
+    <div class="nav-sep"></div>
+    <div class="nav-project" id="nav-project">Loading…</div>
+  </div>
+  <div class="nav-right">
+    <span class="save-indicator" id="save-indicator">—</span>
+    <div class="nav-unit">Unit 5 of 5</div>
+  </div>
+</nav>
+
+<div class="tabbar">
+  <button class="tab-btn active" onclick="switchTab('adoption',this)"><span class="tab-num">1</span> Adoption Map</button>
+  <button class="tab-btn" onclick="switchTab('nudges',this)"><span class="tab-num">2</span> Nudge Plan</button>
+  <button class="tab-btn" onclick="switchTab('momentum',this)"><span class="tab-num">3</span> Momentum</button>
+  <button class="tab-btn" onclick="switchTab('ai',this)"><span class="tab-num">4</span> AI &amp; Export</button>
+</div>
+
+<div class="workspace"><div class="content">
+
+<!-- ══ TAB 1: ADOPTION MAP ══ -->
+<div class="pane active" id="pane-adoption">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 5 · Adoption Map</div>
+    <div class="pane-title">Where are your stakeholders on the adoption curve?</div>
+    <div class="pane-desc">Behaviour change happens in stages. Map each group to their current position, define the behaviour you want, and name the barrier stopping them from moving forward.</div>
+  </div>
+
+  <div id="comms-carry" class="hint-box support" style="display:none;">
+    <strong>From Unit 4:</strong> <span id="comms-carry-text"></span>
+  </div>
+
+  <div class="hint-box">
+    <strong>Adoption stages:</strong> Unaware → Aware → Experimenting → Using → Advocating. Click a stage to mark where each stakeholder currently is. The right intervention depends entirely on where they are — not where you want them to be.
+  </div>
+
+  <div id="adoption-cards">
+    <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;">Add stakeholders in Unit 3 to populate the adoption map.</div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+    <button class="btn btn-primary" onclick="switchTab('nudges',document.querySelectorAll('.tab-btn')[1])">Nudge Plan →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 2: NUDGE PLAN ══ -->
+<div class="pane" id="pane-nudges">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 5 · Nudge Plan</div>
+    <div class="pane-title">Design interventions that make change easier</div>
+    <div class="pane-desc">Use the EAST framework. Each nudge should respond to a specific diagnosed barrier — not be chosen at random. The question is always: what makes this next step easier, more appealing, more social, or better timed?</div>
+  </div>
+
+  <div class="east-grid">
+    <div class="east-card east-easy">
+      <span class="east-badge">Easy</span>
+      <div class="east-card-title">Reduce friction</div>
+      <div class="east-card-desc">Simplify the desired behaviour. Defaults, templates, one-click access, pre-filled forms. Make doing nothing harder than changing.</div>
+    </div>
+    <div class="east-card east-attractive">
+      <span class="east-badge">Attractive</span>
+      <div class="east-card-title">Make it appealing</div>
+      <div class="east-card-desc">Personalise the benefit. Use recognition, visible progress, or identity alignment. People move toward things that feel rewarding.</div>
+    </div>
+    <div class="east-card east-social">
+      <span class="east-badge">Social</span>
+      <div class="east-card-title">Use peer influence</div>
+      <div class="east-card-desc">Show that people similar to them are already doing it. Champions, peer stories, visible adoption by respected colleagues.</div>
+    </div>
+    <div class="east-card east-timely">
+      <span class="east-badge">Timely</span>
+      <div class="east-card-title">Intervene at the right moment</div>
+      <div class="east-card-desc">Deliver when people are most receptive — at a decision point, after a frustrating experience, or when momentum is building.</div>
+    </div>
+  </div>
+
+  <div class="nudge-list" id="nudge-list">
+    <div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.8rem;">No nudges yet. Add one below.</div>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="addNudge()">+ Add nudge</button>
+
+  <div style="display:flex;justify-content:space-between;margin-top:1.5rem;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="switchTab('adoption',document.querySelectorAll('.tab-btn')[0])">← Adoption Map</button>
+    <button class="btn btn-primary" onclick="switchTab('momentum',document.querySelectorAll('.tab-btn')[2])">Momentum →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 3: MOMENTUM ══ -->
+<div class="pane" id="pane-momentum">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 5 · Momentum</div>
+    <div class="pane-title">Track what is working</div>
+    <div class="pane-desc">Momentum is built and monitored — not assumed. Check the signals below to score your current momentum, then reflect on what is accelerating or stalling the change.</div>
+  </div>
+
+  <div class="momentum-wrap">
+    <div class="momentum-title">Change momentum signals</div>
+    <div class="momentum-score-display" id="momentum-score">0%</div>
+    <div class="momentum-bar-track">
+      <div class="momentum-bar-fill" id="momentum-fill" style="width:0%"></div>
+    </div>
+    <div class="momentum-status" id="momentum-status">Check the signals that are true in your change right now.</div>
+    <div class="momentum-signals" id="momentum-signals"></div>
+  </div>
+
+  <div class="field-group">
+    <label class="label">What is accelerating momentum right now?</label>
+    <textarea class="field-textarea" id="momentum-accelerators" placeholder="What is working? Where are you seeing energy, adoption, or positive signals?" oninput="autosave()"></textarea>
+  </div>
+  <div class="field-group">
+    <label class="label">What is stalling momentum?</label>
+    <textarea class="field-textarea" id="momentum-blockers" placeholder="Where is adoption slower than expected? What barriers keep reappearing?" oninput="autosave()"></textarea>
+  </div>
+  <div class="field-group">
+    <label class="label">What one thing would create a tipping point?</label>
+    <textarea class="field-textarea" id="momentum-tipping" placeholder="If this happened, it would significantly shift the momentum of this change…" oninput="autosave()"></textarea>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+    <button class="btn btn-secondary" onclick="switchTab('nudges',document.querySelectorAll('.tab-btn')[1])">← Nudge Plan</button>
+    <button class="btn btn-primary" onclick="switchTab('ai',document.querySelectorAll('.tab-btn')[3])">AI &amp; Export →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 4: AI & EXPORT ══ -->
+<div class="pane" id="pane-ai">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 5 · AI &amp; Export</div>
+    <div class="pane-title">Full change system prompt</div>
+    <div class="pane-desc">Your entire change journey — vision, forces, stakeholders, communication, and momentum — is assembled here. Choose a mode and take it to Claude or ChatGPT.</div>
+  </div>
+
+  <div class="ai-mode-grid">
+    <div class="ai-mode-card active" onclick="setMode('nudges',this)">
+      <div class="ai-mode-title">⚡ Improve the nudges</div>
+      <div class="ai-mode-desc">Are the nudges specific enough? Are they matched to the right adoption stages and barriers?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('momentum',this)">
+      <div class="ai-mode-title">📈 Diagnose momentum</div>
+      <div class="ai-mode-desc">What is accelerating or stalling adoption? What would create a tipping point?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('resistance',this)">
+      <div class="ai-mode-title">🛡️ Address resistance</div>
+      <div class="ai-mode-desc">Design specific behavioural interventions for the most resistant stakeholders.</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('system',this)">
+      <div class="ai-mode-title">🔁 Full system review</div>
+      <div class="ai-mode-desc">Review the entire five-unit journey. Where are the weakest links? What would make it more coherent?</div>
+    </div>
+  </div>
+
+  <div class="prompt-box">
+    <div class="prompt-box-head">
+      <span class="prompt-box-label">Generated prompt</span>
+      <span style="font-size:0.7rem;color:var(--muted);">Complete all five units for a richer prompt</span>
+    </div>
+    <div class="prompt-text" id="prompt-output">Loading…</div>
+    <div class="prompt-actions">
+      <button class="btn btn-navy" id="btn-copy" onclick="copyPrompt(this)">Copy prompt</button>
+      <a class="btn btn-secondary" href="https://claude.ai" target="_blank" onclick="softCopy()">Open Claude ↗</a>
+      <a class="btn btn-secondary" href="https://chat.openai.com" target="_blank" onclick="softCopy()">Open ChatGPT ↗</a>
+    </div>
+  </div>
+
+  <div class="complete-box">
+    <div class="complete-icon">🎯</div>
+    <div class="complete-title">You have completed the full change journey.</div>
+    <div class="complete-sub">Vision → Forces → Stakeholders → Communication → Momentum.<br>Your change case is now a living document. Return to any unit as the situation evolves.</div>
+    <div class="complete-actions">
+      <a href="index.html" class="btn btn-primary">Back to Projects</a>
+      <button class="btn btn-secondary" onclick="exportProject()">Export as JSON</button>
+    </div>
+  </div>
+</div>
+</div>
+
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+let projectId  = null;
+let activeMode = 'nudges';
+let saveTimer  = null;
+let vision={}, forces={}, shData={stakeholders:[]}, commsData={audiences:[]};
+
+const ADOPTION_STAGES = ['Unaware','Aware','Experimenting','Using','Advocating'];
+const EAST_TYPES = ['easy','attractive','social','timely'];
+
+const MOMENTUM_SIGNALS = [
+  'At least one group has moved up the adoption curve',
+  'Champions are visible and actively sharing their experience',
+  'Sceptics are asking practical questions, not just rejecting',
+  'Leadership is visibly role-modelling the new behaviour',
+  'Early pilot results are being shared across the organisation',
+  'The change is referenced in day-to-day conversations',
+  'Requests for support or training are increasing',
+  'Resistance in key groups is reducing in intensity',
+];
+
+let data = {
+  adoption_map: [],
+  nudges: [],
+  momentum_checked: [],
+  momentum_accelerators: '',
+  momentum_blockers: '',
+  momentum_tipping: '',
+};
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+// ── INIT ────────────────────────────────────────────────────
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  projectId = params.get('project') || localStorage.getItem('cmt_current_project');
+
+  if (projectId) {
+    const projects = JSON.parse(localStorage.getItem('cmt_projects') || '[]');
+    const p = projects.find(p => p.id === projectId);
+    if (p) document.getElementById('nav-project').textContent = p.title;
+
+    const vRaw  = localStorage.getItem(`cmt_module_${projectId}_vision`);
+    if (vRaw) vision = JSON.parse(vRaw);
+
+    const fRaw  = localStorage.getItem(`cmt_module_${projectId}_forces`);
+    if (fRaw) forces = JSON.parse(fRaw);
+
+    const shRaw = localStorage.getItem(`cmt_module_${projectId}_stakeholders`);
+    if (shRaw) shData = JSON.parse(shRaw);
+
+    const cRaw  = localStorage.getItem(`cmt_module_${projectId}_communication`);
+    if (cRaw) {
+      commsData = JSON.parse(cRaw);
+      const objDo = commsData.obj_do;
+      if (objDo) {
+        document.getElementById('comms-carry-text').textContent = `Desired action from Unit 4: "${objDo}"`;
+        document.getElementById('comms-carry').style.display = 'block';
+      }
+    }
+
+    const saved = localStorage.getItem(`cmt_module_${projectId}_nudges`);
+    if (saved) { try { data = { ...data, ...JSON.parse(saved) }; } catch(e) {} }
+
+    // Seed adoption map from stakeholders if empty
+    if (!data.adoption_map.length && shData.stakeholders?.length) {
+      data.adoption_map = shData.stakeholders.map(s => ({
+        id: s.id,
+        name: s.name || 'Unnamed',
+        role: s.role || s.group || '',
+        current_stage: s.readiness || 0,
+        target_stage: Math.min((s.readiness || 0) + 2, 4),
+        desired_behaviour: '',
+        barrier: '',
+      }));
+    }
+  }
+
+  // Restore text fields
+  setF('momentum-accelerators', data.momentum_accelerators);
+  setF('momentum-blockers',     data.momentum_blockers);
+  setF('momentum-tipping',      data.momentum_tipping);
+
+  renderAdoptionCards();
+  renderNudges();
+  renderMomentumSignals();
+  updateMomentumScore();
+  updatePrompt();
+}
+
+// ── ADOPTION MAP ─────────────────────────────────────────────
+function renderAdoptionCards() {
+  const c = document.getElementById('adoption-cards');
+  if (!data.adoption_map.length) {
+    c.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;">Add stakeholders in Unit 3 to populate the adoption map.</div>';
+    return;
+  }
+  c.innerHTML = data.adoption_map.map((item, i) => {
+    const steps = ADOPTION_STAGES.map((s, si) => {
+      let cls = '';
+      if (si < item.current_stage) cls = 'passed';
+      else if (si === item.current_stage) cls = 'active';
+      else if (si === item.target_stage) cls = 'target';
+      return `<div class="adopt-step ${cls}" onclick="setCurrentStage(${i},${si})" title="Set current stage to ${s}">${s}</div>`;
+    }).join('');
+
+    return `
+      <div style="background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:0.85rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.65rem;flex-wrap:wrap;gap:0.5rem;">
+          <div>
+            <div style="font-size:0.88rem;font-weight:700;color:var(--navy);">${esc(item.name)}</div>
+            ${item.role ? `<div style="font-size:0.7rem;color:var(--muted);">${esc(item.role)}</div>` : ''}
+          </div>
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);">
+            Current: <strong style="color:var(--navy)">${ADOPTION_STAGES[item.current_stage]}</strong>
+            &nbsp;→&nbsp;Target: <strong style="color:var(--support)">${ADOPTION_STAGES[item.target_stage]}</strong>
+          </div>
+        </div>
+        <div class="adoption-strip">${steps}</div>
+        <div class="grid-2" style="margin-top:0.6rem;">
+          <div class="field-group" style="margin:0;">
+            <label class="label">Desired behaviour</label>
+            <input class="field-input" style="font-size:0.8rem;" value="${esc(item.desired_behaviour)}"
+              placeholder="What should they do differently?" oninput="updateAdoption(${i},'desired_behaviour',this.value)">
+          </div>
+          <div class="field-group" style="margin:0;">
+            <label class="label">Main barrier to moving forward</label>
+            <input class="field-input" style="font-size:0.8rem;" value="${esc(item.barrier)}"
+              placeholder="What is stopping them from progressing?" oninput="updateAdoption(${i},'barrier',this.value)">
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function setCurrentStage(i, stage) {
+  data.adoption_map[i].current_stage = stage;
+  if (stage >= data.adoption_map[i].target_stage) {
+    data.adoption_map[i].target_stage = Math.min(stage + 1, 4);
+  }
+  renderAdoptionCards();
+  autosave();
+}
+function updateAdoption(i, field, val) {
+  data.adoption_map[i][field] = val;
+  autosave();
+}
+
+// ── NUDGES ───────────────────────────────────────────────────
+function addNudge() {
+  data.nudges.push({
+    id: uid(), title: '', east: 'easy',
+    target: '', barrier: '', action: '', timing: '',
+  });
+  renderNudges();
+  autosave();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.nudge-title-input');
+    inputs[inputs.length - 1]?.focus();
+  }, 50);
+}
+
+function removeNudge(i) {
+  data.nudges.splice(i, 1);
+  renderNudges();
+  autosave();
+}
+
+function updateNudge(i, field, val) {
+  data.nudges[i][field] = val;
+  if (field === 'east') renderNudges();
+  autosave();
+}
+
+function renderNudges() {
+  const list = document.getElementById('nudge-list');
+  if (!data.nudges.length) {
+    list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.8rem;">No nudges yet. Add one below.</div>';
+    return;
+  }
+
+  // Build stakeholder options for target dropdown
+  const shOptions = ['<option value="">All stakeholders</option>',
+    ...shData.stakeholders.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`)
+  ].join('');
+
+  list.innerHTML = data.nudges.map((n, i) => {
+    const eastOpts = EAST_TYPES.map(t =>
+      `<option value="${t}"${n.east === t ? ' selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`
+    ).join('');
+
+    return `
+      <div class="nudge-card">
+        <div class="nudge-card-top">
+          <span class="east-type-badge badge-${n.east}">${n.east}</span>
+          <input class="nudge-title-input" value="${esc(n.title)}" placeholder="Name this nudge…"
+            oninput="updateNudge(${i},'title',this.value)">
+          <select class="nudge-east-select" onchange="updateNudge(${i},'east',this.value)">${eastOpts}</select>
+          <button class="nudge-remove" onclick="removeNudge(${i})">×</button>
+        </div>
+        <div class="grid-3">
+          <div class="field-group" style="margin:0;">
+            <label class="label">Target stakeholder</label>
+            <select class="field-input" style="padding:0.5rem 0.7rem;cursor:pointer;" onchange="updateNudge(${i},'target',this.value)">
+              ${shOptions.replace(`value="${esc(n.target)}"`, `value="${esc(n.target)}" selected`)}
+            </select>
+          </div>
+          <div class="field-group" style="margin:0;">
+            <label class="label">Barrier this addresses</label>
+            <input class="field-input" style="font-size:0.8rem;" value="${esc(n.barrier)}"
+              placeholder="What obstacle does this remove?" oninput="updateNudge(${i},'barrier',this.value)">
+          </div>
+          <div class="field-group" style="margin:0;">
+            <label class="label">Timing</label>
+            <input class="field-input" style="font-size:0.8rem;" value="${esc(n.timing)}"
+              placeholder="When / at what moment?" oninput="updateNudge(${i},'timing',this.value)">
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:0.6rem;margin-bottom:0;">
+          <label class="label">Concrete action</label>
+          <textarea class="field-textarea" style="min-height:60px;" placeholder="Exactly what will you do? Be specific — a nudge that can't be scheduled doesn't happen."
+            oninput="updateNudge(${i},'action',this.value)">${esc(n.action)}</textarea>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── MOMENTUM ─────────────────────────────────────────────────
+function renderMomentumSignals() {
+  const container = document.getElementById('momentum-signals');
+  container.innerHTML = MOMENTUM_SIGNALS.map((sig, i) => {
+    const checked = data.momentum_checked.includes(i);
+    return `
+      <div class="signal-row" onclick="toggleSignal(${i})">
+        <div class="signal-check${checked ? ' on' : ''}">${checked ? '✓' : ''}</div>
+        <div class="signal-text">${sig}</div>
+      </div>`;
+  }).join('');
+}
+
+function toggleSignal(i) {
+  const idx = data.momentum_checked.indexOf(i);
+  if (idx >= 0) data.momentum_checked.splice(idx, 1);
+  else data.momentum_checked.push(i);
+  renderMomentumSignals();
+  updateMomentumScore();
+  autosave();
+}
+
+function updateMomentumScore() {
+  const score = Math.round((data.momentum_checked.length / MOMENTUM_SIGNALS.length) * 100);
+  document.getElementById('momentum-score').textContent = `${score}%`;
+  document.getElementById('momentum-fill').style.width = `${score}%`;
+
+  let status = '';
+  if (score === 0)       status = 'Check the signals that are true in your change right now.';
+  else if (score <= 25)  status = 'Early signals only — momentum is fragile. Focus on 1–2 visible wins.';
+  else if (score <= 50)  status = 'Building momentum. Strengthen the social signals and visible leadership.';
+  else if (score <= 75)  status = 'Good momentum. Protect the energy and address the remaining gaps.';
+  else                   status = 'Strong momentum. Shift focus to sustaining and institutionalising the change.';
+  document.getElementById('momentum-status').textContent = status;
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab === 'ai') updatePrompt();
+}
+
+// ── AUTOSAVE ─────────────────────────────────────────────────
+function autosave() {
+  data.momentum_accelerators = valF('momentum-accelerators');
+  data.momentum_blockers     = valF('momentum-blockers');
+  data.momentum_tipping      = valF('momentum-tipping');
+
+  const ind = document.getElementById('save-indicator');
+  ind.textContent = 'Saving…'; ind.className = 'save-indicator saving';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(`cmt_module_${projectId}_nudges`, JSON.stringify(data));
+    ind.textContent = 'Saved'; ind.className = 'save-indicator saved';
+    setTimeout(() => { ind.textContent = '—'; ind.className = 'save-indicator'; }, 2000);
+  }, 800);
+}
+
+// ── EXPORT ───────────────────────────────────────────────────
+function exportProject() {
+  const payload = {
+    meta: { exported_at: new Date().toISOString(), schema_version: '1.0', source: 'Change Management Platform' },
+    project: { title: vision.ctx_title || 'Untitled', organization: vision.ctx_org || '', your_role: vision.ctx_role || '' },
+    modules: {
+      vision,
+      forces,
+      stakeholders: shData,
+      communication: commsData,
+      nudges: data,
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${(vision.ctx_title || 'project').replace(/\s+/g, '-').toLowerCase()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Project exported!', 'ok');
+}
+
+// ── AI PROMPT ────────────────────────────────────────────────
+function setMode(mode, card) {
+  activeMode = mode;
+  document.querySelectorAll('.ai-mode-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  updatePrompt();
+}
+
+function updatePrompt() {
+  // Build full system context
+  const drivingStr   = (forces.driving  || []).map(f => `  + ${f.label} [${f.strength}/5, ${f.type}]`).join('\n') || '  (not mapped)';
+  const resistingStr = (forces.resisting || []).map(f => `  - ${f.label} [${f.strength}/5, ${f.type}]`).join('\n') || '  (not mapped)';
+
+  const shStr = shData.stakeholders.map(s =>
+    `  ${s.name} (${s.role||s.group||'—'}) — Stance: ${s.stance||'unknown'}, Readiness: ${ADOPTION_STAGES[s.readiness]||'unknown'}`
+  ).join('\n') || '  (none mapped)';
+
+  const adoptionStr = data.adoption_map.map(item =>
+    `  ${item.name}: currently ${ADOPTION_STAGES[item.current_stage]} → target ${ADOPTION_STAGES[item.target_stage]}\n    Desired: ${item.desired_behaviour||'not specified'} | Barrier: ${item.barrier||'not specified'}`
+  ).join('\n') || '  (not mapped)';
+
+  const nudgeStr = data.nudges.map(n => {
+    const shName = shData.stakeholders.find(s => s.id === n.target)?.name || n.target || 'all';
+    return `  [${n.east.toUpperCase()}] ${n.title||'(unnamed)'} → Target: ${shName} | Barrier: ${n.barrier||'not specified'} | When: ${n.timing||'not specified'}\n    Action: ${n.action||'not specified'}`;
+  }).join('\n') || '  (none defined)';
+
+  const momentumScore = Math.round((data.momentum_checked.length / MOMENTUM_SIGNALS.length) * 100);
+  const signalsActive = data.momentum_checked.map(i => `  ✓ ${MOMENTUM_SIGNALS[i]}`).join('\n') || '  (none checked)';
+
+  const base = `CHANGE MANAGEMENT SYSTEM — Full Five-Unit Review
+
+UNIT 1 — VISION
+Initiative: ${vision.ctx_title||'(not set)'}
+Organisation: ${vision.ctx_org||'(not set)'}
+Vision: ${vision.vision_statement||'(not set)'}
+North Star: ${vision.north_star||'(not set)'}
+Case for change: ${vision.vision_case||'(not set)'}
+
+UNIT 2 — FORCES
+Driving forces:
+${drivingStr}
+Restraining forces:
+${resistingStr}
+
+UNIT 3 — STAKEHOLDERS
+${shStr}
+
+UNIT 4 — COMMUNICATION
+Core message problem: ${commsData.core_problem||'(not set)'}
+Core message solution: ${commsData.core_solution||'(not set)'}
+Know: ${commsData.obj_know||'(not set)'}
+Feel: ${commsData.obj_feel||'(not set)'}
+Do: ${commsData.obj_do||'(not set)'}
+
+UNIT 5 — ADOPTION & NUDGES
+Adoption positions:
+${adoptionStr}
+
+Nudge plan:
+${nudgeStr}
+
+Momentum score: ${momentumScore}%
+Active signals:
+${signalsActive}
+
+Accelerators: ${data.momentum_accelerators||'(not specified)'}
+Stalls: ${data.momentum_blockers||'(not specified)'}
+Tipping point: ${data.momentum_tipping||'(not specified)'}`;
+
+  const modes = {
+    nudges: `${base}
+
+TASK: Review the nudge plan as an experienced behaviour designer:
+1. Are the nudges matched to the right adoption stages? (training someone unaware is wasted effort)
+2. Are the EAST types correctly assigned — is each nudge actually Easy / Attractive / Social / Timely?
+3. Which nudge is most likely to create visible, shareable momentum?
+4. What important nudge is missing that would address the most critical barrier?
+5. Suggest one refined version of the weakest nudge in the current plan.`,
+
+    momentum: `${base}
+
+TASK: Diagnose momentum as a change management consultant:
+1. What does the momentum score (${momentumScore}%) and active signals tell you about where this change is?
+2. What is the most significant gap between accelerators and stalls?
+3. What single action in the next 2 weeks would most shift the momentum score?
+4. What does the tipping point description suggest — is it realistic? What would need to be true for it to happen?`,
+
+    resistance: `${base}
+
+TASK: Design targeted behavioural interventions for resistance:
+1. Identify the 2 stakeholders or groups with the highest resistance potential
+2. For each: what is the specific psychological barrier (fear, loss, identity threat, rational scepticism)?
+3. Design one EAST-based nudge specifically for each resistant group
+4. What is the one thing that, if said or done wrong, would harden their resistance permanently?`,
+
+    system: `${base}
+
+TASK: Review the entire five-unit change system as an objective senior consultant:
+1. Is there a coherent thread from vision to nudges — or are there gaps where the logic breaks down?
+2. Which unit has the weakest or most underdeveloped content? What should be added?
+3. Are the nudges causally connected to the diagnosed barriers from the force field and stakeholder map?
+4. What is the single most important thing this change leader should do differently based on everything you can see?
+5. What would a sceptical board member say about the weakest link in this plan?`,
+  };
+
+  document.getElementById('prompt-output').textContent = modes[activeMode];
+}
+
+function copyPrompt(btn) {
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2500);
+  });
+}
+function softCopy() { navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).catch(() => {}); }
+
+function valF(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setF(id, v) { const el = document.getElementById(id); if (el && v) el.value = v; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg, type='') {
+  const t = document.getElementById('toast'); t.textContent = msg;
+  t.className = `toast show ${type}`; setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+init();
+</script>
+</body>
+</html>

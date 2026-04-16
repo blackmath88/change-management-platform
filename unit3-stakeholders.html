@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 · Stakeholder Mapping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0d2d6e;--blue:#1a56db;--blue-dk:#1244b8;--blue-lt:#e8eefb;
+  --text:#0f1623;--body:#3a4460;--muted:#7a8aaa;--rule:#dde3f0;
+  --bg:#f4f6fb;--surface:#ffffff;--bg-grey:#eef1f8;
+  --support:#1a7a3a;--support-lt:#e4f4ea;
+  --resist:#c0392b;--resist-lt:#fde8e8;
+  --amber:#b45309;--amber-lt:#fef3c7;
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);z-index:50;}
+.nav-left{display:flex;align-items:center;gap:0.75rem;}
+.nav-back{font-size:0.73rem;color:rgba(255,255,255,0.38);text-decoration:none;transition:color 0.2s;font-weight:500;}
+.nav-back:hover{color:rgba(255,255,255,0.7);}
+.nav-sep{width:1px;height:13px;background:rgba(255,255,255,0.15);}
+.nav-title{font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.75);}
+.nav-project{font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.28);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-right{display:flex;align-items:center;gap:0.75rem;}
+.nav-unit{font-family:var(--mono);font-size:0.63rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:100px;background:rgba(124,58,237,0.25);color:rgba(180,150,255,0.7);border:1px solid rgba(124,58,237,0.3);}
+.save-indicator{font-family:var(--mono);font-size:0.62rem;color:rgba(255,255,255,0.25);transition:color 0.3s;}
+.save-indicator.saving{color:rgba(255,200,0,0.6);}
+.save-indicator.saved{color:rgba(100,220,130,0.7);}
+
+.tabbar{background:var(--surface);border-bottom:1px solid var(--rule);display:flex;align-items:stretch;flex-shrink:0;padding:0 1.5rem;overflow-x:auto;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-btn{display:flex;align-items:center;gap:0.5rem;padding:0 1.1rem;height:44px;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-num{font-family:var(--mono);font-size:0.65rem;font-weight:600;width:18px;height:18px;border-radius:50%;background:var(--bg-grey);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.tab-btn.active .tab-num{background:var(--blue-lt);color:var(--blue);}
+
+.workspace{flex:1;display:grid;grid-template-columns:240px 1fr;min-height:0;overflow:hidden;}
+.sidebar{background:var(--surface);border-right:1px solid var(--rule);display:flex;flex-direction:column;min-height:0;}
+.sidebar-head{padding:0.85rem 1rem;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sidebar-label{font-size:0.63rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.btn-add{display:inline-flex;align-items:center;gap:0.3rem;padding:0.28rem 0.65rem;background:var(--blue);color:#fff;border:none;border-radius:100px;font-family:var(--sans);font-size:0.68rem;font-weight:600;cursor:pointer;transition:background 0.15s;}
+.btn-add:hover{background:var(--blue-dk);}
+.sidebar-list{flex:1;overflow-y:auto;}
+.sh-item{display:flex;align-items:center;gap:0.55rem;padding:0.65rem 1rem;cursor:pointer;border-bottom:1px solid var(--rule);transition:background 0.1s;}
+.sh-item:hover{background:var(--bg-grey);}
+.sh-item.active{background:var(--blue-lt);border-left:3px solid var(--blue);padding-left:calc(1rem - 3px);}
+.sh-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;flex-shrink:0;color:#fff;font-family:var(--mono);}
+.sh-info{min-width:0;flex:1;}
+.sh-name{font-size:0.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-role{font-size:0.65rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sh-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.content{flex:1;overflow-y:auto;min-height:0;}
+.pane{display:none;}
+.pane.active{display:block;}
+.wrap{max-width:860px;margin:0 auto;padding:1.5rem 2rem 4rem;}
+.wrap-wide{max-width:1060px;margin:0 auto;padding:1.5rem 2rem 4rem;}
+
+.pane-head{margin-bottom:1.5rem;}
+.pane-eyebrow{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem;}
+.pane-eyebrow::before{content:'';display:block;width:16px;height:2px;background:var(--purple);border-radius:1px;}
+.pane-title{font-size:1.2rem;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pane-desc{font-size:0.82rem;color:var(--body);line-height:1.65;max-width:560px;}
+
+.label{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.35rem;display:block;}
+.field-input,.field-textarea,.field-select{font-family:var(--sans);font-size:0.84rem;color:var(--text);background:var(--surface);border:1.5px solid var(--rule);padding:0.58rem 0.78rem;outline:none;transition:border-color 0.15s;border-radius:6px;width:100%;}
+.field-input:focus,.field-textarea:focus,.field-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,0.08);}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--muted);}
+.field-textarea{resize:vertical;min-height:70px;line-height:1.6;}
+.field-group{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.85rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.85rem;}
+
+.hint-box{background:var(--blue-lt);border:1px solid rgba(26,86,219,0.15);border-radius:8px;padding:0.9rem 1.1rem;font-size:0.79rem;color:var(--body);line-height:1.6;margin-bottom:1.25rem;}
+.hint-box strong{color:var(--navy);}
+.hint-box.purple{background:var(--purple-lt);border-color:rgba(124,58,237,0.15);}
+.hint-box.purple strong{color:var(--purple);}
+.divider{height:1px;background:var(--rule);margin:1.5rem 0;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:7px;font-family:var(--sans);font-size:0.8rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;text-decoration:none;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:var(--blue-dk);}
+.btn-secondary{background:var(--bg-grey);color:var(--body);border:1.5px solid var(--rule);}
+.btn-secondary:hover{background:var(--blue-lt);color:var(--blue);border-color:var(--blue);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:#0a2258;}
+.btn-danger{background:var(--resist-lt);color:var(--resist);border:1.5px solid rgba(192,57,43,0.2);}
+.btn-danger:hover{background:var(--resist);color:#fff;}
+.btn-sm{padding:0.38rem 0.85rem;font-size:0.73rem;border-radius:6px;}
+.btn.copied{background:var(--support);color:#fff;}
+
+/* ── SLIDER ── */
+.slider-row{display:flex;align-items:center;gap:0.75rem;}
+.slider-row input[type=range]{flex:1;accent-color:var(--blue);}
+.slider-val{font-family:var(--mono);font-size:0.72rem;font-weight:600;color:var(--navy);min-width:20px;text-align:right;}
+
+/* ── STANCE CHIPS ── */
+.stance-chips{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.stance-chip{padding:0.28rem 0.7rem;border:1.5px solid var(--rule);border-radius:100px;font-size:0.72rem;font-weight:600;cursor:pointer;background:var(--bg);transition:all 0.12s;color:var(--muted);}
+.stance-chip:hover{border-color:var(--blue);color:var(--blue);}
+.stance-chip.supporter{background:var(--support-lt);border-color:var(--support);color:var(--support);}
+.stance-chip.neutral{background:var(--amber-lt);border-color:var(--amber);color:var(--amber);}
+.stance-chip.skeptical{background:#fff7ed;border-color:#c2410c;color:#c2410c;}
+.stance-chip.blocker{background:var(--resist-lt);border-color:var(--resist);color:var(--resist);}
+
+/* ── READINESS STEPS ── */
+.readiness-strip{display:flex;gap:0;border-radius:7px;overflow:hidden;border:1.5px solid var(--rule);}
+.readiness-step{flex:1;padding:0.5rem 0.4rem;text-align:center;font-size:0.65rem;font-weight:600;cursor:pointer;transition:all 0.12s;border-right:1px solid var(--rule);color:var(--muted);}
+.readiness-step:last-child{border-right:none;}
+.readiness-step:hover{background:var(--blue-lt);color:var(--blue);}
+.readiness-step.active{background:var(--navy);color:#fff;}
+
+/* ── MAP ── */
+.map-canvas-wrap{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;padding:1rem;margin-bottom:1rem;}
+.map-canvas{width:100%;aspect-ratio:1.5;position:relative;background:var(--bg);border:1px solid var(--rule);border-radius:6px;}
+.map-axis{position:absolute;font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.map-quadrant{position:absolute;font-size:0.58rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:rgba(13,45,110,0.12);pointer-events:none;}
+.map-node{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;font-weight:700;color:#fff;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,0.18);}
+.map-node:hover{transform:translate(-50%,-50%) scale(1.18);box-shadow:0 4px 16px rgba(0,0,0,0.22);z-index:10;}
+.map-tooltip{position:absolute;background:var(--navy);color:#fff;padding:0.65rem 0.9rem;border-radius:6px;font-size:0.75rem;pointer-events:none;z-index:20;display:none;max-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.25);line-height:1.5;}
+
+/* ── NO SELECTION ── */
+.no-selection{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;color:var(--muted);text-align:center;gap:0.75rem;}
+.no-selection-icon{font-size:2.5rem;opacity:0.35;}
+
+/* ── AI PANE ── */
+.prompt-box{background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;}
+.prompt-box-head{padding:0.85rem 1.25rem;background:var(--bg-grey);border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;}
+.prompt-box-label{font-family:var(--mono);font-size:0.7rem;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+.prompt-text{font-family:var(--mono);font-size:0.72rem;color:var(--body);padding:1.25rem;line-height:1.7;white-space:pre-wrap;max-height:320px;overflow-y:auto;}
+.prompt-actions{padding:1rem 1.25rem;border-top:1px solid var(--rule);display:flex;gap:0.75rem;flex-wrap:wrap;}
+.ai-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;}
+.ai-mode-card{background:var(--surface);border:1.5px solid var(--rule);border-radius:8px;padding:0.9rem 1.1rem;cursor:pointer;transition:all 0.15s;}
+.ai-mode-card:hover{border-color:var(--blue);}
+.ai-mode-card.active{border-color:var(--blue);background:var(--blue-lt);}
+.ai-mode-title{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:0.2rem;}
+.ai-mode-desc{font-size:0.72rem;color:var(--body);line-height:1.45;}
+
+.next-unit{background:var(--navy);border-radius:10px;padding:1.5rem 2rem;margin-top:2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.next-unit-text{color:rgba(255,255,255,0.7);font-size:0.82rem;line-height:1.5;}
+.next-unit-text strong{color:#fff;display:block;font-size:0.95rem;margin-bottom:0.2rem;}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:500;padding:0.65rem 1.1rem;border-radius:7px;box-shadow:0 8px 24px rgba(10,20,50,0.2);transform:translateY(60px);opacity:0;transition:all 0.2s;z-index:200;}
+.toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-back">← Projects</a>
+    <div class="nav-sep"></div>
+    <div class="nav-title">Map Your Stakeholders</div>
+    <div class="nav-sep"></div>
+    <div class="nav-project" id="nav-project">Loading…</div>
+  </div>
+  <div class="nav-right">
+    <span class="save-indicator" id="save-indicator">—</span>
+    <div class="nav-unit">Unit 3 of 5</div>
+  </div>
+</nav>
+
+<div class="tabbar">
+  <button class="tab-btn active" onclick="switchTab('identify',this)"><span class="tab-num">1</span> Identify</button>
+  <button class="tab-btn" onclick="switchTab('profile',this)"><span class="tab-num">2</span> Profile</button>
+  <button class="tab-btn" onclick="switchTab('map',this)"><span class="tab-num">3</span> Map</button>
+  <button class="tab-btn" onclick="switchTab('ai',this)"><span class="tab-num">4</span> AI &amp; Export</button>
+</div>
+
+<div class="workspace">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-head">
+    <span class="sidebar-label">Stakeholders (<span id="sh-count">0</span>)</span>
+    <button class="btn-add" onclick="addStakeholder()">+ Add</button>
+  </div>
+  <div class="sidebar-list" id="sidebar-list">
+    <div style="padding:1.5rem 1rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">Add stakeholders using the button above.</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- ══ TAB 1: IDENTIFY ══ -->
+<div class="pane active" id="pane-identify">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 3 · Stakeholder Mapping</div>
+    <div class="pane-title">Who matters in this change?</div>
+    <div class="pane-desc">Identify the individuals and groups who influence or are affected by the change. Add them in the sidebar, then profile each one in the Profile tab.</div>
+  </div>
+
+  <div id="forces-carry" class="hint-box purple" style="display:none;">
+    <strong>From your force field:</strong> <span id="forces-carry-text"></span>
+  </div>
+
+  <div class="hint-box">
+    <strong>Who to include:</strong> Decision-makers, those with power to block, those most affected, those who could champion the change, and those whose silence you cannot afford to assume is support.
+  </div>
+
+  <div style="background:var(--surface);border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:1fr 80px 80px 80px 100px;background:var(--navy);padding:0.6rem 1rem;gap:0.5rem;">
+      <span style="font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);">Name / Role</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);text-align:center;">Power</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);text-align:center;">Interest</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);text-align:center;">Stance</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);text-align:center;"></span>
+    </div>
+    <div id="sh-table-body">
+      <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.8rem;">No stakeholders yet. Add using the sidebar.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 2: PROFILE ══ -->
+<div class="pane" id="pane-profile">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 3 · Profile</div>
+    <div class="pane-title">Understand each stakeholder</div>
+    <div class="pane-desc">Select a stakeholder from the sidebar to profile them. The richer your understanding, the more targeted your communication and actions will be.</div>
+  </div>
+  <div id="profile-panel">
+    <div class="no-selection">
+      <div class="no-selection-icon">👤</div>
+      <div>Select a stakeholder from the sidebar<br>to view and edit their profile.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 3: MAP ══ -->
+<div class="pane" id="pane-map">
+<div class="wrap-wide">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 3 · Power/Interest Map</div>
+    <div class="pane-title">See who sits where</div>
+    <div class="pane-desc">Nodes are positioned by power (vertical) and interest (horizontal). Color shows stance. Hover to see details.</div>
+  </div>
+  <div class="map-canvas-wrap">
+    <div class="map-canvas" id="map-canvas">
+      <div class="map-axis" style="bottom:0.4rem;left:50%;transform:translateX(-50%);">Interest →</div>
+      <div class="map-axis" style="left:0.3rem;top:50%;transform:translateY(-50%) rotate(-90deg);">Power</div>
+      <div class="map-quadrant" style="top:8%;right:8%;">Manage closely</div>
+      <div class="map-quadrant" style="top:8%;left:8%;">Keep satisfied</div>
+      <div class="map-quadrant" style="bottom:8%;right:8%;">Keep informed</div>
+      <div class="map-quadrant" style="bottom:8%;left:8%;">Monitor</div>
+      <div class="map-tooltip" id="map-tooltip"></div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;padding:0.75rem 0.5rem 0;">
+      <span style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--support);display:inline-block;"></span>Supporter</span>
+      <span style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block;"></span>Neutral</span>
+      <span style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);"><span style="width:10px;height:10px;border-radius:50%;background:var(--resist);display:inline-block;"></span>Skeptical/Blocker</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 4: AI ══ -->
+<div class="pane" id="pane-ai">
+<div class="wrap">
+  <div class="pane-head">
+    <div class="pane-eyebrow">Unit 3 · AI &amp; Export</div>
+    <div class="pane-title">Take your stakeholder map to an AI thinking partner</div>
+    <div class="pane-desc">All stakeholder data is embedded. Choose a mode and copy the prompt.</div>
+  </div>
+  <div class="ai-mode-grid">
+    <div class="ai-mode-card active" onclick="setMode('prioritise',this)">
+      <div class="ai-mode-title">🎯 Prioritise engagement</div>
+      <div class="ai-mode-desc">Which stakeholders need the most attention? In what order should you engage them?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('blockers',this)">
+      <div class="ai-mode-title">🧱 Address blockers</div>
+      <div class="ai-mode-desc">For each skeptic or blocker, what is the underlying concern and how should you approach them?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('champions',this)">
+      <div class="ai-mode-title">⭐ Build a coalition</div>
+      <div class="ai-mode-desc">Who are your best potential champions and how could they influence others?</div>
+    </div>
+    <div class="ai-mode-card" onclick="setMode('comms',this)">
+      <div class="ai-mode-title">📢 Communication bridge</div>
+      <div class="ai-mode-desc">Translate each stakeholder into an audience for Unit 4. What must each group know, feel, and do?</div>
+    </div>
+  </div>
+  <div class="prompt-box">
+    <div class="prompt-box-head">
+      <span class="prompt-box-label">Generated prompt</span>
+    </div>
+    <div class="prompt-text" id="prompt-output">Add stakeholders to generate a prompt.</div>
+    <div class="prompt-actions">
+      <button class="btn btn-navy" id="btn-copy" onclick="copyPrompt(this)">Copy prompt</button>
+      <a class="btn btn-secondary" href="https://claude.ai" target="_blank" onclick="softCopy()">Open Claude ↗</a>
+      <a class="btn btn-secondary" href="https://chat.openai.com" target="_blank" onclick="softCopy()">Open ChatGPT ↗</a>
+    </div>
+  </div>
+  <div class="next-unit">
+    <div class="next-unit-text">
+      <strong>Ready for Unit 4?</strong>
+      Your stakeholders become your audiences. Now design the messages that will move them.
+    </div>
+    <a href="unit4-communication.html" class="btn btn-primary" id="next-link">Unit 4: Communication →</a>
+  </div>
+</div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /workspace -->
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+let projectId  = null;
+let selected   = null;
+let activeMode = 'prioritise';
+let saveTimer  = null;
+let vision     = {};
+let forces     = {};
+
+const STANCE_COLORS = { supporter:'#1a7a3a', neutral:'#b45309', skeptical:'#c2410c', blocker:'#c0392b', '':'#7a8aaa' };
+const READINESS = ['Unaware','Aware','Experimenting','Using','Advocating'];
+
+let data = { stakeholders: [] };
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  projectId = params.get('project') || localStorage.getItem('cmt_current_project');
+
+  if (projectId) {
+    const projects = JSON.parse(localStorage.getItem('cmt_projects') || '[]');
+    const p = projects.find(p => p.id === projectId);
+    if (p) document.getElementById('nav-project').textContent = p.title;
+
+    // Load previous units for carry-over
+    const vRaw = localStorage.getItem(`cmt_module_${projectId}_vision`);
+    if (vRaw) vision = JSON.parse(vRaw);
+
+    const fRaw = localStorage.getItem(`cmt_module_${projectId}_forces`);
+    if (fRaw) {
+      forces = JSON.parse(fRaw);
+      const topRes = (forces.resisting || []).sort((a,b) => b.strength-a.strength).slice(0,3).map(f => f.label).filter(Boolean);
+      if (topRes.length) {
+        document.getElementById('forces-carry-text').textContent = `Top restraining forces: ${topRes.join(' · ')}`;
+        document.getElementById('forces-carry').style.display = 'block';
+      }
+    }
+
+    const saved = localStorage.getItem(`cmt_module_${projectId}_stakeholders`);
+    if (saved) { try { data = JSON.parse(saved); } catch(e) {} }
+
+    document.getElementById('next-link').href = `unit4-communication.html?project=${projectId}`;
+  }
+
+  renderSidebar();
+  renderTable();
+}
+
+// ── STAKEHOLDER CRUD ──────────────────────────────────────────
+function addStakeholder() {
+  const sh = {
+    id: uid(), name: 'New Stakeholder', role: '', group: '',
+    power: 3, interest: 3, stance: '', readiness: 0,
+    motivations: '', concerns: '', needs: '', notes: '',
+    influence: 'medium',
+  };
+  data.stakeholders.push(sh);
+  selected = sh.id;
+  renderSidebar();
+  renderTable();
+  switchTab('profile', document.querySelectorAll('.tab-btn')[1]);
+  renderProfile();
+  autosave();
+  // Focus name
+  setTimeout(() => document.getElementById('sh-name')?.focus(), 50);
+}
+
+function deleteStakeholder(id) {
+  data.stakeholders = data.stakeholders.filter(s => s.id !== id);
+  if (selected === id) { selected = data.stakeholders[0]?.id || null; }
+  renderSidebar(); renderTable(); renderProfile(); renderMap(); autosave();
+}
+
+function selectStakeholder(id) {
+  selected = id;
+  renderSidebar();
+  switchTab('profile', document.querySelectorAll('.tab-btn')[1]);
+  renderProfile();
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────
+function renderSidebar() {
+  document.getElementById('sh-count').textContent = data.stakeholders.length;
+  const list = document.getElementById('sidebar-list');
+  if (!data.stakeholders.length) {
+    list.innerHTML = '<div style="padding:1.25rem 1rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">Add stakeholders using the button above.</div>';
+    return;
+  }
+  list.innerHTML = data.stakeholders.map(s => {
+    const initials = (s.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const color = STANCE_COLORS[s.stance] || '#7a8aaa';
+    return `<div class="sh-item${selected===s.id?' active':''}" onclick="selectStakeholder('${s.id}')">
+      <div class="sh-avatar" style="background:${color}">${initials}</div>
+      <div class="sh-info">
+        <div class="sh-name">${esc(s.name||'Unnamed')}</div>
+        <div class="sh-role">${esc(s.role||s.group||'—')}</div>
+      </div>
+      <div class="sh-dot" style="background:${color}"></div>
+    </div>`;
+  }).join('');
+}
+
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('sh-table-body');
+  if (!data.stakeholders.length) {
+    body.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.8rem;">No stakeholders yet. Add using the sidebar.</div>';
+    return;
+  }
+  body.innerHTML = data.stakeholders.map(s => {
+    const color = STANCE_COLORS[s.stance] || '#7a8aaa';
+    const stanceLabel = s.stance ? s.stance.charAt(0).toUpperCase() + s.stance.slice(1) : '—';
+    return `<div style="display:grid;grid-template-columns:1fr 80px 80px 80px 100px;padding:0.65rem 1rem;gap:0.5rem;border-bottom:1px solid var(--rule);align-items:center;cursor:pointer;transition:background 0.1s;" onmouseenter="this.style.background='var(--bg-grey)'" onmouseleave="this.style.background=''" onclick="selectStakeholder('${s.id}');switchTab('profile',document.querySelectorAll('.tab-btn')[1])">
+      <div>
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text);">${esc(s.name||'Unnamed')}</div>
+        <div style="font-size:0.7rem;color:var(--muted);">${esc(s.role||'—')}</div>
+      </div>
+      <div style="text-align:center;font-family:var(--mono);font-size:0.75rem;font-weight:700;color:var(--navy);">${s.power}/5</div>
+      <div style="text-align:center;font-family:var(--mono);font-size:0.75rem;font-weight:700;color:var(--navy);">${s.interest}/5</div>
+      <div style="text-align:center;">
+        <span style="font-size:0.68rem;font-weight:600;padding:0.18rem 0.5rem;border-radius:3px;background:${color}20;color:${color};">${stanceLabel}</span>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteStakeholder('${s.id}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+function renderProfile() {
+  const panel = document.getElementById('profile-panel');
+  if (!selected) {
+    panel.innerHTML = '<div class="no-selection"><div class="no-selection-icon">👤</div><div>Select a stakeholder from the sidebar.</div></div>';
+    return;
+  }
+  const sh = data.stakeholders.find(s => s.id === selected);
+  if (!sh) return;
+
+  const stanceChips = ['supporter','neutral','skeptical','blocker'].map(st =>
+    `<div class="stance-chip ${sh.stance===st?st:''}" onclick="setStance('${sh.id}','${st}')">${st.charAt(0).toUpperCase()+st.slice(1)}</div>`
+  ).join('');
+
+  const readinessSteps = READINESS.map((r,i) =>
+    `<div class="readiness-step${sh.readiness===i?' active':''}" onclick="setReadiness('${sh.id}',${i})">${r}</div>`
+  ).join('');
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.5rem;">
+      <div style="font-size:1rem;font-weight:700;color:var(--navy);">${esc(sh.name||'Unnamed stakeholder')}</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteStakeholder('${sh.id}')">Remove</button>
+    </div>
+    <div class="grid-2">
+      <div class="field-group">
+        <label class="label">Name</label>
+        <input class="field-input" id="sh-name" value="${esc(sh.name)}" placeholder="Full name or group name" oninput="updateField('${sh.id}','name',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="label">Role / title</label>
+        <input class="field-input" value="${esc(sh.role)}" placeholder="e.g. Head of Finance" oninput="updateField('${sh.id}','role',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="label">Group</label>
+        <input class="field-input" value="${esc(sh.group)}" placeholder="e.g. Leadership, End users, IT" oninput="updateField('${sh.id}','group',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="label">Influence level</label>
+        <select class="field-select" onchange="updateField('${sh.id}','influence',this.value)">
+          <option${sh.influence==='low'?' selected':''}>low</option>
+          <option${sh.influence==='medium'?' selected':''}>medium</option>
+          <option${sh.influence==='high'?' selected':''}>high</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="label">Stance toward change</label>
+      <div class="stance-chips">${stanceChips}</div>
+    </div>
+
+    <div class="field-group" style="margin-top:0.85rem;">
+      <label class="label">Adoption readiness</label>
+      <div class="readiness-strip">${readinessSteps}</div>
+    </div>
+
+    <div class="grid-2" style="margin-top:0.85rem;">
+      <div class="field-group">
+        <label class="label">Power (1–5)</label>
+        <div class="slider-row">
+          <input type="range" min="1" max="5" value="${sh.power}" oninput="updateField('${sh.id}','power',+this.value);this.nextElementSibling.textContent=this.value;renderMap();">
+          <span class="slider-val">${sh.power}</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="label">Interest (1–5)</label>
+        <div class="slider-row">
+          <input type="range" min="1" max="5" value="${sh.interest}" oninput="updateField('${sh.id}','interest',+this.value);this.nextElementSibling.textContent=this.value;renderMap();">
+          <span class="slider-val">${sh.interest}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid-2">
+      <div class="field-group">
+        <label class="label">Motivations — what do they care about?</label>
+        <textarea class="field-textarea" placeholder="What drives them? What do they want from this change — or from stopping it?" oninput="updateField('${sh.id}','motivations',this.value)">${esc(sh.motivations)}</textarea>
+      </div>
+      <div class="field-group">
+        <label class="label">Concerns &amp; fears</label>
+        <textarea class="field-textarea" placeholder="What are they worried about? What might they lose?" oninput="updateField('${sh.id}','concerns',this.value)">${esc(sh.concerns)}</textarea>
+      </div>
+      <div class="field-group">
+        <label class="label">What do they need from us?</label>
+        <textarea class="field-textarea" placeholder="Information, reassurance, involvement, recognition…?" oninput="updateField('${sh.id}','needs',this.value)">${esc(sh.needs)}</textarea>
+      </div>
+      <div class="field-group">
+        <label class="label">Notes</label>
+        <textarea class="field-textarea" placeholder="Anything else important about this stakeholder or how to approach them…" oninput="updateField('${sh.id}','notes',this.value)">${esc(sh.notes)}</textarea>
+      </div>
+    </div>`;
+}
+
+function updateField(id, field, val) {
+  const sh = data.stakeholders.find(s => s.id === id);
+  if (!sh) return;
+  sh[field] = val;
+  if (field === 'name' || field === 'stance') { renderSidebar(); renderTable(); }
+  autosave();
+}
+function setStance(id, stance) {
+  updateField(id, 'stance', stance);
+  renderProfile(); renderSidebar(); renderTable();
+}
+function setReadiness(id, i) {
+  updateField(id, 'readiness', i);
+  renderProfile();
+}
+
+// ── MAP ────────────────────────────────────────────────────────
+function renderMap() {
+  const canvas = document.getElementById('map-canvas');
+  if (!canvas) return;
+  // Remove old nodes
+  canvas.querySelectorAll('.map-node').forEach(n => n.remove());
+  const tooltip = document.getElementById('map-tooltip');
+
+  data.stakeholders.forEach(s => {
+    const xPct = ((s.interest - 1) / 4) * 80 + 10;
+    const yPct = (1 - (s.power - 1) / 4) * 80 + 10;
+    const color = STANCE_COLORS[s.stance] || '#7a8aaa';
+    const initials = (s.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const size = 28 + (s.influence === 'high' ? 8 : s.influence === 'low' ? -4 : 0);
+
+    const node = document.createElement('div');
+    node.className = 'map-node';
+    node.style.cssText = `left:${xPct}%;top:${yPct}%;width:${size}px;height:${size}px;background:${color};font-size:${size>30?'0.62rem':'0.55rem'};`;
+    node.textContent = initials;
+    node.addEventListener('mouseenter', e => {
+      tooltip.style.display = 'block';
+      tooltip.style.left = `${xPct + 4}%`;
+      tooltip.style.top  = `${yPct + 4}%`;
+      tooltip.innerHTML = `<strong>${esc(s.name)}</strong><br>${esc(s.role||s.group||'')}<br>Power ${s.power} · Interest ${s.interest}<br>${s.stance||'stance unknown'}`;
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+    node.addEventListener('click', () => { selectStakeholder(s.id); switchTab('profile', document.querySelectorAll('.tab-btn')[1]); });
+    canvas.appendChild(node);
+  });
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab === 'profile') renderProfile();
+  if (tab === 'map') renderMap();
+  if (tab === 'ai') updatePrompt();
+}
+
+// ── AUTOSAVE ──────────────────────────────────────────────────
+function autosave() {
+  const ind = document.getElementById('save-indicator');
+  ind.textContent = 'Saving…'; ind.className = 'save-indicator saving';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(`cmt_module_${projectId}_stakeholders`, JSON.stringify(data));
+    ind.textContent = 'Saved'; ind.className = 'save-indicator saved';
+    setTimeout(() => { ind.textContent = '—'; ind.className = 'save-indicator'; }, 2000);
+  }, 800);
+}
+
+// ── AI PROMPT ─────────────────────────────────────────────────
+function setMode(mode, card) {
+  activeMode = mode;
+  document.querySelectorAll('.ai-mode-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  updatePrompt();
+}
+
+function updatePrompt() {
+  const shList = data.stakeholders.map(s =>
+    `  ${s.name||'Unnamed'} (${s.role||s.group||'—'}) — Power ${s.power}/5, Interest ${s.interest}/5, Stance: ${s.stance||'unknown'}, Readiness: ${READINESS[s.readiness]||'unknown'}
+    Motivations: ${s.motivations||'not specified'}
+    Concerns: ${s.concerns||'not specified'}
+    Needs: ${s.needs||'not specified'}`
+  ).join('\n\n') || '  (no stakeholders added yet)';
+
+  const base = `CHANGE MANAGEMENT CONTEXT — Unit 3: Stakeholder Mapping
+
+Initiative: ${vision.ctx_title||'(not set)'}
+Organisation: ${vision.ctx_org||'(not set)'}
+Vision: ${vision.vision_statement||'(not set)'}
+
+STAKEHOLDERS (${data.stakeholders.length}):
+${shList}`;
+
+  const modes = {
+    prioritise: `${base}
+
+TASK: Act as a change management consultant. Prioritise stakeholder engagement:
+1. Which 3 stakeholders need the most urgent attention and why?
+2. In what sequence should engagement happen — who must be moved before others can be influenced?
+3. Are there any stakeholders whose position is likely to influence others significantly?
+4. What is the biggest engagement risk if someone is neglected?`,
+
+    blockers: `${base}
+
+TASK: Focus on the skeptics and blockers in this stakeholder map:
+1. For each skeptic or blocker, what is the likely underlying concern driving their resistance?
+2. Is their resistance rational, emotional, or political?
+3. What is the most effective approach for each — direct conversation, co-creation, peer influence, or something else?
+4. Which blocker, if moved to neutral, would most change the overall dynamic?`,
+
+    champions: `${base}
+
+TASK: Identify coalition-building opportunities:
+1. Who are the strongest potential champions, and why would people listen to them?
+2. How could each champion influence a specific skeptic or resistant group?
+3. What would each champion need to feel confident in their advocacy role?
+4. Suggest a simple coalition-building sequence: who activates whom?`,
+
+    comms: `${base}
+
+TASK: Translate this stakeholder map into a communication design brief for Unit 4:
+For each stakeholder (or group of similar stakeholders), define:
+- KNOW: What is the one thing they must understand after our first communication?
+- FEEL: What emotional shift do we need to create?
+- DO: What specific action or behaviour change do we want from them?
+- TONE: What communication approach will land with this audience?`,
+  };
+
+  document.getElementById('prompt-output').textContent = modes[activeMode];
+}
+
+function copyPrompt(btn) {
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2500);
+  });
+}
+function softCopy() { navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).catch(()=>{}); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Change Management Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:      #0d2d6e;
+  --blue:      #1a56db;
+  --blue-dk:   #1244b8;
+  --blue-lt:   #e8eefb;
+  --text:      #0f1623;
+  --body:      #3a4460;
+  --muted:     #7a8aaa;
+  --rule:      #dde3f0;
+  --bg:        #f4f6fb;
+  --surface:   #ffffff;
+  --bg-grey:   #eef1f8;
+  --support:   #1a7a3a;
+  --support-lt:#e4f4ea;
+  --resist:    #c0392b;
+  --resist-lt: #fde8e8;
+  --amber:     #b45309;
+  --amber-lt:  #fef3c7;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+/* ── NAV ── */
+nav {
+  background: var(--navy); height: 56px; padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 50;
+}
+.nav-brand { display: flex; align-items: center; gap: 0.75rem; }
+.nav-logo {
+  width: 28px; height: 28px; background: var(--blue);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 800; color: #fff; font-family: var(--mono);
+  letter-spacing: -0.05em;
+}
+.nav-name { font-size: 0.88rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.nav-status { font-family: var(--mono); font-size: 0.62rem; color: rgba(255,255,255,0.3); display: flex; align-items: center; gap: 0.4rem; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.status-dot.live { background: #22c55e; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a3a8a 100%);
+  padding: 3.5rem 2rem 3rem;
+  text-align: center;
+  border-bottom: 3px solid var(--blue);
+}
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 1rem;
+}
+.hero-title {
+  font-size: 2.4rem; font-weight: 800; color: #fff;
+  letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 0.75rem;
+}
+.hero-title span { color: #93b4f8; }
+.hero-sub {
+  font-size: 1rem; color: rgba(255,255,255,0.6);
+  max-width: 520px; margin: 0 auto 2rem; line-height: 1.65;
+}
+.hero-journey {
+  display: inline-flex; align-items: center; gap: 0;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px; padding: 0.5rem 1.25rem;
+  font-size: 0.75rem; color: rgba(255,255,255,0.5);
+  font-family: var(--mono); letter-spacing: 0.03em;
+}
+.hero-journey-step { color: rgba(255,255,255,0.7); font-weight: 600; }
+.hero-journey-sep { margin: 0 0.6rem; opacity: 0.3; }
+
+/* ── MAIN ── */
+.main { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+/* ── NEW PROJECT ── */
+.new-project-card {
+  background: var(--surface); border: 2px dashed var(--rule);
+  border-radius: 12px; padding: 2rem;
+  margin-bottom: 2rem; transition: border-color 0.15s;
+}
+.new-project-card:focus-within { border-color: var(--blue); }
+.new-project-title {
+  font-size: 0.9rem; font-weight: 700; color: var(--navy);
+  margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.new-project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem; }
+.field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.field-group.full { grid-column: span 2; }
+.label { font-family: var(--mono); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.field-input, .field-textarea {
+  font-family: var(--sans); font-size: 0.85rem;
+  padding: 0.6rem 0.85rem; border: 1.5px solid var(--rule);
+  border-radius: 7px; background: var(--bg); color: var(--text);
+  transition: border-color 0.15s, background 0.15s; width: 100%;
+}
+.field-input:focus, .field-textarea:focus {
+  outline: none; border-color: var(--blue);
+  background: var(--surface); box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
+}
+.field-textarea { resize: none; height: 68px; line-height: 1.5; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.65rem 1.3rem; border-radius: 8px;
+  font-family: var(--sans); font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.18s; text-decoration: none;
+}
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: var(--blue-dk); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { background: var(--bg-grey); color: var(--body); border: 1.5px solid var(--rule); }
+.btn-secondary:hover { background: var(--blue-lt); color: var(--blue); border-color: var(--blue); }
+.btn-ghost { background: none; color: var(--muted); border: 1.5px solid transparent; font-size: 0.75rem; padding: 0.4rem 0.75rem; }
+.btn-ghost:hover { color: var(--resist); border-color: rgba(192,57,43,0.2); background: var(--resist-lt); }
+.btn-sm { padding: 0.38rem 0.85rem; font-size: 0.73rem; border-radius: 6px; }
+
+/* ── PROJECTS LIST ── */
+.projects-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.projects-header-title {
+  font-size: 0.8rem; font-weight: 700; color: var(--navy);
+  text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--mono);
+}
+.projects-count { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); }
+
+.projects-empty {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 10px; padding: 3rem 2rem; text-align: center;
+}
+.projects-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.projects-empty-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.35rem; }
+.projects-empty-sub { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+.project-card {
+  background: var(--surface); border: 1.5px solid var(--rule);
+  border-radius: 12px; padding: 1.5rem;
+  margin-bottom: 0.85rem; transition: all 0.15s; cursor: pointer;
+  display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: start;
+}
+.project-card:hover { border-color: var(--blue); box-shadow: 0 4px 16px rgba(13,45,110,0.07); transform: translateY(-1px); }
+.project-card-org {
+  font-family: var(--mono); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+.project-card-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; line-height: 1.3; }
+.project-card-summary { font-size: 0.78rem; color: var(--body); line-height: 1.5; margin-bottom: 0.85rem; }
+
+.project-card-meta { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.project-card-date { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
+
+/* Progress bar */
+.progress-wrap { display: flex; align-items: center; gap: 0.6rem; }
+.progress-track {
+  display: flex; gap: 3px;
+}
+.progress-seg {
+  width: 22px; height: 5px; border-radius: 3px;
+  background: var(--rule); transition: background 0.2s;
+}
+.progress-seg.done { background: var(--blue); }
+.progress-seg.active { background: var(--blue-lt); border: 1.5px solid var(--blue); }
+.progress-label { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
+
+.project-card-actions { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
+
+/* Stage badge */
+.stage-badge {
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.22rem 0.65rem; border-radius: 100px;
+}
+.stage-unit_1 { background: var(--blue-lt); color: var(--blue); }
+.stage-unit_2 { background: var(--amber-lt); color: var(--amber); }
+.stage-unit_3 { background: #f3e8ff; color: #7c3aed; }
+.stage-unit_4 { background: #e0f2fe; color: #0e7490; }
+.stage-unit_5 { background: var(--support-lt); color: var(--support); }
+.stage-complete { background: var(--support-lt); color: var(--support); }
+
+/* ── UNIT OVERVIEW ── */
+.units-overview {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 12px; overflow: hidden; margin-top: 2.5rem;
+}
+.units-overview-head {
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rule);
+  font-size: 0.8rem; font-weight: 700; color: var(--navy);
+  text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--mono);
+}
+.unit-row {
+  display: grid; grid-template-columns: 48px 1fr auto;
+  align-items: center; gap: 1rem;
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--rule);
+  transition: background 0.1s;
+}
+.unit-row:last-child { border-bottom: none; }
+.unit-row:hover { background: var(--bg-grey); }
+.unit-num {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  background: var(--bg-grey); color: var(--muted);
+  flex-shrink: 0;
+}
+.unit-num.u1 { background: var(--blue-lt); color: var(--blue); }
+.unit-num.u2 { background: var(--amber-lt); color: var(--amber); }
+.unit-num.u3 { background: #f3e8ff; color: #7c3aed; }
+.unit-num.u4 { background: #e0f2fe; color: #0e7490; }
+.unit-num.u5 { background: var(--support-lt); color: var(--support); }
+.unit-name { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 0.15rem; }
+.unit-question { font-size: 0.75rem; color: var(--muted); }
+.unit-output { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); text-align: right; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(10,20,50,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border-radius: 14px;
+  padding: 2rem; width: 480px; max-width: 95vw;
+  box-shadow: 0 24px 64px rgba(10,20,50,0.2);
+  transform: translateY(12px); transition: transform 0.2s;
+}
+.modal-overlay.visible .modal { transform: translateY(0); }
+.modal-title { font-size: 1.05rem; font-weight: 800; color: var(--navy); margin-bottom: 0.35rem; }
+.modal-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+.modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+/* ── IMPORT ── */
+.import-zone {
+  border: 2px dashed var(--rule); border-radius: 8px;
+  padding: 1.5rem; text-align: center; cursor: pointer;
+  transition: all 0.15s; margin-top: 1.5rem;
+}
+.import-zone:hover { border-color: var(--blue); background: var(--blue-lt); }
+.import-zone-text { font-size: 0.8rem; color: var(--muted); }
+
+/* ── LOADING ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--rule) 25%, var(--bg-grey) 50%, var(--rule) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.sk-card { height: 120px; margin-bottom: 0.85rem; border-radius: 12px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  background: var(--navy); color: #fff; font-size: 0.8rem; font-weight: 500;
+  padding: 0.75rem 1.25rem; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(10,20,50,0.2);
+  transform: translateY(80px); opacity: 0; transition: all 0.25s;
+  z-index: 200; max-width: 320px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--support); }
+.toast.error { background: var(--resist); }
+
+@media (max-width: 640px) {
+  .hero-title { font-size: 1.75rem; }
+  .new-project-grid { grid-template-columns: 1fr; }
+  .field-group.full { grid-column: span 1; }
+  .project-card { grid-template-columns: 1fr; }
+  .project-card-actions { flex-direction: row; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">CM</div>
+    <div class="nav-name">Change Management Platform</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Connecting…</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">A structured environment for leading change</div>
+  <h1 class="hero-title">Your <span>change projects</span>,<br>all in one place.</h1>
+  <p class="hero-sub">Work through your change initiative across five connected units — from vision to momentum. Each project builds one continuous, living case.</p>
+  <div class="hero-journey">
+    <span class="hero-journey-step">Vision</span>
+    <span class="hero-journey-sep">→</span>
+    <span class="hero-journey-step">Forces</span>
+    <span class="hero-journey-sep">→</span>
+    <span class="hero-journey-step">Stakeholders</span>
+    <span class="hero-journey-sep">→</span>
+    <span class="hero-journey-step">Communication</span>
+    <span class="hero-journey-sep">→</span>
+    <span class="hero-journey-step">Momentum</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- NEW PROJECT FORM -->
+  <div class="new-project-card">
+    <div class="new-project-title">＋ Start a new change project</div>
+    <div class="new-project-grid">
+      <div class="field-group">
+        <label class="label">Project title</label>
+        <input class="field-input" id="np-title" placeholder="e.g. AI Copilot Introduction" maxlength="120">
+      </div>
+      <div class="field-group">
+        <label class="label">Organisation</label>
+        <input class="field-input" id="np-org" placeholder="e.g. University of Valais" maxlength="120">
+      </div>
+      <div class="field-group">
+        <label class="label">Your role</label>
+        <input class="field-input" id="np-role" placeholder="e.g. Change Lead, HR Director" maxlength="120">
+      </div>
+      <div class="field-group">
+        <!-- spacer -->
+      </div>
+      <div class="field-group full">
+        <label class="label">What is this change about? (optional)</label>
+        <textarea class="field-textarea" id="np-summary" placeholder="One or two sentences on what's changing and why it matters…"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btn-create" onclick="createProject()">Create project →</button>
+      <label class="btn btn-secondary" style="cursor:pointer;">
+        Import JSON <input type="file" accept=".json" style="display:none;" onchange="importProject(event)">
+      </label>
+    </div>
+  </div>
+
+  <!-- PROJECTS LIST -->
+  <div class="projects-header">
+    <div class="projects-header-title">Your projects</div>
+    <div class="projects-count" id="projects-count"></div>
+  </div>
+  <div id="projects-list">
+    <div class="skeleton sk-card"></div>
+    <div class="skeleton sk-card" style="opacity:0.6;"></div>
+  </div>
+
+  <!-- UNIT OVERVIEW -->
+  <div class="units-overview">
+    <div class="units-overview-head">The Five Units</div>
+    <div class="unit-row">
+      <div class="unit-num u1">01</div>
+      <div>
+        <div class="unit-name">Shape Your Change Vision</div>
+        <div class="unit-question">Why does this change need to happen? Where are we going?</div>
+      </div>
+      <div class="unit-output">vision · case for change</div>
+    </div>
+    <div class="unit-row">
+      <div class="unit-num u2">02</div>
+      <div>
+        <div class="unit-name">Understand the Forces</div>
+        <div class="unit-question">What is pushing the change forward — and what is blocking it?</div>
+      </div>
+      <div class="unit-output">driving · restraining forces</div>
+    </div>
+    <div class="unit-row">
+      <div class="unit-num u3">03</div>
+      <div>
+        <div class="unit-name">Map Your Stakeholders</div>
+        <div class="unit-question">Who matters? How do they stand? What do they need?</div>
+      </div>
+      <div class="unit-output">stakeholder map · influence</div>
+    </div>
+    <div class="unit-row">
+      <div class="unit-num u4">04</div>
+      <div>
+        <div class="unit-name">Communicate with Impact</div>
+        <div class="unit-question">How do we move people? What must they know, feel, and do?</div>
+      </div>
+      <div class="unit-output">messages · channels · framing</div>
+    </div>
+    <div class="unit-row">
+      <div class="unit-num u5">05</div>
+      <div>
+        <div class="unit-name">Nudge &amp; Build Momentum</div>
+        <div class="unit-question">What interventions actually change behaviour and sustain adoption?</div>
+      </div>
+      <div class="unit-output">nudges · adoption · actions</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title">Delete this project?</div>
+    <div class="modal-sub">This will permanently delete the project and all its unit data. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-primary" style="background:var(--resist);" id="btn-confirm-delete" onclick="confirmDelete()">Delete project</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="cmt-client.js"></script>
+<script>
+'use strict';
+
+const UNIT_FILES = {
+  unit_1:   'unit1-vision.html',
+  unit_2:   'unit2-forces.html',
+  unit_3:   'unit3-stakeholders.html',
+  unit_4:   'unit4-communication.html',
+  unit_5:   'unit5-nudges.html',
+  complete: 'unit1-vision.html',
+};
+
+const STAGE_LABELS = {
+  unit_1:   'Unit 1 — Vision',
+  unit_2:   'Unit 2 — Forces',
+  unit_3:   'Unit 3 — Stakeholders',
+  unit_4:   'Unit 4 — Communication',
+  unit_5:   'Unit 5 — Momentum',
+  complete: 'Complete',
+};
+
+const STAGE_TO_NUM = {
+  unit_1: 1, unit_2: 2, unit_3: 3, unit_4: 4, unit_5: 5, complete: 5
+};
+
+let deleteTargetId = null;
+
+// ── INIT ────────────────────────────────────────────────────────
+async function init() {
+  // Check Supabase connection
+  const { ok } = await CMT.ping();
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  if (ok) {
+    dot.classList.add('live');
+    text.textContent = 'Connected';
+  } else {
+    text.textContent = 'Offline';
+  }
+  loadProjects();
+}
+
+// ── LOAD PROJECTS ────────────────────────────────────────────────
+async function loadProjects() {
+  const list = document.getElementById('projects-list');
+  const count = document.getElementById('projects-count');
+
+  try {
+    const projects = await CMT.getProjects();
+    count.textContent = `${projects.length} project${projects.length !== 1 ? 's' : ''}`;
+
+    if (!projects.length) {
+      list.innerHTML = `
+        <div class="projects-empty">
+          <div class="projects-empty-icon">📋</div>
+          <div class="projects-empty-title">No projects yet</div>
+          <div class="projects-empty-sub">Create your first change project above.<br>Each project works through all five units as one connected case.</div>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = projects.map(p => renderProjectCard(p)).join('');
+
+  } catch (e) {
+    list.innerHTML = `<div class="projects-empty"><div class="projects-empty-title">Could not load projects</div><div class="projects-empty-sub">${e.message}</div></div>`;
+  }
+}
+
+function renderProjectCard(p) {
+  const stageNum  = STAGE_TO_NUM[p.stage] || 1;
+  const segs = [1,2,3,4,5].map(n => {
+    const cls = n < stageNum ? 'done' : n === stageNum ? 'active' : '';
+    return `<div class="progress-seg ${cls}"></div>`;
+  }).join('');
+
+  const updated = new Date(p.updated_at).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+
+  return `
+    <div class="project-card" onclick="openProject('${p.id}')">
+      <div>
+        ${p.organization ? `<div class="project-card-org">${esc(p.organization)}</div>` : ''}
+        <div class="project-card-title">${esc(p.title)}</div>
+        ${p.summary ? `<div class="project-card-summary">${esc(p.summary)}</div>` : ''}
+        <div class="project-card-meta">
+          <div class="progress-wrap">
+            <div class="progress-track">${segs}</div>
+            <div class="progress-label">${STAGE_LABELS[p.stage] || 'Unit 1'}</div>
+          </div>
+          <div class="project-card-date">Updated ${updated}</div>
+        </div>
+      </div>
+      <div class="project-card-actions" onclick="event.stopPropagation()">
+        <span class="stage-badge stage-${p.stage}">${STAGE_LABELS[p.stage] || 'Unit 1'}</span>
+        <button class="btn btn-ghost btn-sm" onclick="promptDelete('${p.id}')">Delete</button>
+      </div>
+    </div>`;
+}
+
+// ── OPEN PROJECT ─────────────────────────────────────────────────
+function openProject(projectId) {
+  CMT.setCurrentProjectId(projectId);
+  // Load projects data to find stage
+  CMT.getProject(projectId).then(p => {
+    if (!p) return;
+    const file = UNIT_FILES[p.stage] || 'unit1-vision.html';
+    window.location.href = `${file}?project=${projectId}`;
+  });
+}
+
+// ── CREATE PROJECT ───────────────────────────────────────────────
+async function createProject() {
+  const title   = document.getElementById('np-title').value.trim();
+  const org     = document.getElementById('np-org').value.trim();
+  const role    = document.getElementById('np-role').value.trim();
+  const summary = document.getElementById('np-summary').value.trim();
+
+  if (!title) {
+    document.getElementById('np-title').focus();
+    showToast('Please give your project a title.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-create');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
+  try {
+    const project = await CMT.createProject({ title, organization: org, your_role: role, summary });
+    showToast('Project created!', 'success');
+    // Navigate to Unit 1
+    window.location.href = `unit1-vision.html?project=${project.id}`;
+  } catch (e) {
+    showToast('Could not create project: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Create project →';
+  }
+}
+
+// ── IMPORT ───────────────────────────────────────────────────────
+async function importProject(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    showToast('Importing…');
+    const project = await CMT.importProject(file);
+    showToast('Project imported!', 'success');
+    await loadProjects();
+  } catch (e) {
+    showToast('Import failed: ' + e.message, 'error');
+  }
+  event.target.value = '';
+}
+
+// ── DELETE ───────────────────────────────────────────────────────
+function promptDelete(projectId) {
+  deleteTargetId = projectId;
+  document.getElementById('delete-modal').classList.add('visible');
+}
+function closeDeleteModal() {
+  deleteTargetId = null;
+  document.getElementById('delete-modal').classList.remove('visible');
+}
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  try {
+    await CMT.deleteProject(deleteTargetId);
+    showToast('Project deleted.', 'success');
+    closeDeleteModal();
+    loadProjects();
+  } catch (e) {
+    showToast('Delete failed: ' + e.message, 'error');
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── UTILS ────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on overlay click
+document.getElementById('delete-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteModal();
+});
+
+init();
+</script>
+</body>
+</html>
