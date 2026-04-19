@@ -43,14 +43,11 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 50;
 }
-.nav-left { display: flex; align-items: center; gap: 0.75rem; }
-.nav-back { font-size: 0.73rem; color: rgba(255,255,255,0.38); text-decoration: none; transition: color 0.2s; font-weight: 500; }
-.nav-back:hover { color: rgba(255,255,255,0.7); }
-.nav-sep { width: 1px; height: 13px; background: rgba(255,255,255,0.15); }
-.nav-title { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.75); }
-.nav-project { font-family: var(--mono); font-size: 0.68rem; color: rgba(255,255,255,0.28); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-left  { display: flex; align-items: center; gap: 0.65rem; }
+.nav-logo  { width: 24px; height: 24px; background: var(--blue); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.65rem; font-weight: 800; color: #fff; letter-spacing: -0.05em; flex-shrink: 0; }
+.nav-brand { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88); letter-spacing: -0.01em; }
 .nav-right { display: flex; align-items: center; gap: 0.75rem; }
-.nav-unit { font-family: var(--mono); font-size: 0.63rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.22rem 0.65rem; border-radius: 100px; background: rgba(26,86,219,0.25); color: rgba(255,255,255,0.5); border: 1px solid rgba(26,86,219,0.3); }
+.nav-project { font-family: var(--mono); font-size: 0.63rem; color: rgba(255,255,255,0.3); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .save-indicator { font-family: var(--mono); font-size: 0.62rem; color: rgba(255,255,255,0.25); transition: color 0.3s; }
 .save-indicator.saving { color: rgba(255,200,0,0.6); }
 .save-indicator.saved  { color: rgba(100,220,130,0.7); }
@@ -62,7 +59,7 @@ nav {
 }
 .tabbar::-webkit-scrollbar { display: none; }
 .tab-btn {
-  display: flex; align-items: center; gap: 0.5rem; padding: 0 1.1rem; height: 44px;
+  display: flex; align-items: center; gap: 0.5rem; padding: 0 1.25rem; height: 44px;
   font-family: var(--sans); font-size: 0.78rem; font-weight: 600; color: var(--muted);
   background: none; border: none; cursor: pointer;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -70,15 +67,6 @@ nav {
 }
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
-.tab-num {
-  font-family: var(--mono); font-size: 0.65rem; font-weight: 600;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--bg-grey); color: var(--muted);
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, color 0.15s; flex-shrink: 0;
-}
-.tab-btn.active .tab-num { background: var(--blue-lt); color: var(--blue); }
-.tab-btn.done .tab-num  { background: var(--support-lt); color: var(--support); }
 
 /* ── LAYOUT ── */
 .workspace { flex: 1; display: flex; min-height: 0; overflow: hidden; }
@@ -87,8 +75,8 @@ nav {
 .pane.active { display: block; }
 
 /* ── SHARED ── */
-.wrap      { max-width: 860px; margin: 0 auto; padding: 2rem 2rem 4rem; }
-.wrap-wide { max-width: 1060px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+.wrap      { max-width: 860px; margin: 0 auto; padding: 2.5rem 2.5rem 5rem; }
+.wrap-wide { max-width: 1060px; margin: 0 auto; padding: 2.5rem 2.5rem 5rem; }
 
 .pane-head { margin-bottom: 1.75rem; }
 .pane-eyebrow {
@@ -297,35 +285,30 @@ nav {
 <!-- NAV -->
 <nav>
   <div class="nav-left">
-    <a href="index.html" class="nav-back">← Projects</a>
-    <div class="nav-sep"></div>
-    <div class="nav-title">Shape Your Change Vision</div>
-    <div class="nav-sep"></div>
-    <div class="nav-project" id="nav-project">Loading…</div>
+    <div class="nav-logo">CM</div>
+    <span class="nav-brand">Change Management Platform</span>
   </div>
   <div class="nav-right">
+    <div class="nav-project" id="nav-project"></div>
     <span class="save-indicator" id="save-indicator">—</span>
-    <div class="nav-unit">Unit 1 of 5</div>
   </div>
 </nav>
 
+<!-- PROJECT STRIP -->
+<div class="project-strip"><div id="cmt-strip-inner"></div></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+<div id="cmt-sidebar-mount"></div>
+<div class="unit-main">
+
 <!-- TAB BAR -->
 <div class="tabbar">
-  <button class="tab-btn active" onclick="switchTab('context',this)">
-    <span class="tab-num">1</span> Context
-  </button>
-  <button class="tab-btn" onclick="switchTab('vision',this)">
-    <span class="tab-num">2</span> Vision Statement
-  </button>
-  <button class="tab-btn" onclick="switchTab('criteria',this)">
-    <span class="tab-num">3</span> Six Criteria
-  </button>
-  <button class="tab-btn" onclick="switchTab('northstar',this)">
-    <span class="tab-num">4</span> North Star
-  </button>
-  <button class="tab-btn" onclick="switchTab('ai',this)">
-    <span class="tab-num">5</span> AI &amp; Export
-  </button>
+  <button class="tab-btn active" onclick="switchTab('context',this)">Context</button>
+  <button class="tab-btn" onclick="switchTab('vision',this)">Vision Statement</button>
+  <button class="tab-btn" onclick="switchTab('criteria',this)">Six Criteria</button>
+  <button class="tab-btn" onclick="switchTab('northstar',this)">North Star</button>
+  <button class="tab-btn" onclick="switchTab('ai',this)">AI &amp; Export</button>
 </div>
 
 <div class="workspace"><div class="content">
@@ -386,9 +369,6 @@ nav {
     <textarea class="field-textarea" id="ctx-why" rows="2" placeholder="What is making this change necessary or timely? External pressure, strategic opportunity, internal crisis, leadership decision?" oninput="autosave()"></textarea>
   </div>
 
-  <div style="display:flex;justify-content:flex-end;margin-top:0.5rem;">
-    <button class="btn btn-primary" onclick="switchTab('vision', document.querySelectorAll('.tab-btn')[1])">Next: Vision Statement →</button>
-  </div>
 </div>
 </div>
 
@@ -420,10 +400,6 @@ nav {
     <textarea class="field-textarea" id="vision-case" rows="3" placeholder="Why does this change need to happen? What is the cost of not changing? Keep this crisp — it's the argument you make when someone asks why." oninput="autosave()"></textarea>
   </div>
 
-  <div style="display:flex;justify-content:space-between;margin-top:0.5rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn btn-secondary" onclick="switchTab('context', document.querySelectorAll('.tab-btn')[0])">← Context</button>
-    <button class="btn btn-primary" onclick="switchTab('criteria', document.querySelectorAll('.tab-btn')[2])">Next: Six Criteria →</button>
-  </div>
 </div>
 </div>
 
@@ -449,10 +425,6 @@ nav {
     <!-- Injected by JS -->
   </div>
 
-  <div style="display:flex;justify-content:space-between;margin-top:0.5rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn btn-secondary" onclick="switchTab('vision', document.querySelectorAll('.tab-btn')[1])">← Vision Statement</button>
-    <button class="btn btn-primary" onclick="switchTab('northstar', document.querySelectorAll('.tab-btn')[3])">Next: North Star →</button>
-  </div>
 </div>
 </div>
 
@@ -485,10 +457,6 @@ nav {
 
   <div class="divider"></div>
 
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn btn-secondary" onclick="switchTab('criteria', document.querySelectorAll('.tab-btn')[2])">← Six Criteria</button>
-    <button class="btn btn-primary" onclick="switchTab('ai', document.querySelectorAll('.tab-btn')[4])">AI &amp; Export →</button>
-  </div>
 </div>
 </div>
 
@@ -533,20 +501,17 @@ nav {
     </div>
   </div>
 
-  <div class="next-unit">
-    <div class="next-unit-text">
-      <strong>Ready for Unit 2?</strong>
-      Now that your vision is defined, map the forces — what is pushing this change forward and what is holding it back.
-    </div>
-    <a href="unit2-forces.html" class="btn btn-primary" onclick="saveProjectLink(event)">Unit 2: Forces →</a>
-  </div>
 </div>
 </div>
 
 </div></div><!-- /content /workspace -->
 
+</div><!-- /unit-main -->
+</div><!-- /app-layout -->
+
 <div class="toast" id="toast"></div>
 
+<script src="cmt-sidebar.js"></script>
 <script>
 'use strict';
 

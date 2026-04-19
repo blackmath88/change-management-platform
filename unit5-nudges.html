@@ -28,31 +28,28 @@ html{font-size:15px;scroll-behavior:smooth;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
 nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);z-index:50;}
-.nav-left{display:flex;align-items:center;gap:0.75rem;}
-.nav-back{font-size:0.73rem;color:rgba(255,255,255,0.38);text-decoration:none;transition:color 0.2s;font-weight:500;}
-.nav-back:hover{color:rgba(255,255,255,0.7);}
-.nav-sep{width:1px;height:13px;background:rgba(255,255,255,0.15);}
-.nav-title{font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.75);}
-.nav-project{font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.28);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.nav-left{display:flex;align-items:center;gap:0.65rem;}
+.nav-logo{width:24px;height:24px;background:var(--blue);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.65rem;font-weight:800;color:#fff;letter-spacing:-0.05em;flex-shrink:0;}
+.nav-brand{font-size:0.82rem;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:-0.01em;}
 .nav-right{display:flex;align-items:center;gap:0.75rem;}
-.nav-unit{font-family:var(--mono);font-size:0.63rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:100px;background:rgba(26,122,58,0.25);color:rgba(100,220,130,0.7);border:1px solid rgba(26,122,58,0.3);}
+.nav-project{font-family:var(--mono);font-size:0.63rem;color:rgba(255,255,255,0.3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .save-indicator{font-family:var(--mono);font-size:0.62rem;color:rgba(255,255,255,0.25);transition:color 0.3s;}
 .save-indicator.saving{color:rgba(255,200,0,0.6);}
 .save-indicator.saved{color:rgba(100,220,130,0.7);}
 
 .tabbar{background:var(--surface);border-bottom:1px solid var(--rule);display:flex;align-items:stretch;flex-shrink:0;padding:0 1.5rem;overflow-x:auto;}
 .tabbar::-webkit-scrollbar{display:none;}
-.tab-btn{display:flex;align-items:center;gap:0.5rem;padding:0 1.1rem;height:44px;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;white-space:nowrap;}
+.tab-btn{display:flex;align-items:center;gap:0.5rem;padding:0 1.25rem;height:44px;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;white-space:nowrap;}
 .tab-btn:hover{color:var(--text);}
 .tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
-.tab-num{font-family:var(--mono);font-size:0.65rem;font-weight:600;width:18px;height:18px;border-radius:50%;background:var(--bg-grey);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;flex-shrink:0;}
-.tab-btn.active .tab-num{background:var(--blue-lt);color:var(--blue);}
 
+.app-layout{flex:1;display:flex;min-height:0;overflow:hidden;}
+.unit-main{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;}
 .workspace{flex:1;display:flex;min-height:0;overflow:hidden;}
 .content{flex:1;overflow-y:auto;min-height:0;}
 .pane{display:none;}
 .pane.active{display:block;}
-.wrap{max-width:960px;margin:0 auto;padding:2rem 2rem 4rem;}
+.wrap{max-width:960px;margin:0 auto;padding:2.5rem 2.5rem 5rem;}
 
 .pane-head{margin-bottom:1.75rem;}
 .pane-eyebrow{font-family:var(--mono);font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--support);margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem;}
@@ -175,23 +172,26 @@ nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items
 
 <nav>
   <div class="nav-left">
-    <a href="index.html" class="nav-back">← Projects</a>
-    <div class="nav-sep"></div>
-    <div class="nav-title">Nudge &amp; Build Momentum</div>
-    <div class="nav-sep"></div>
-    <div class="nav-project" id="nav-project">Loading…</div>
+    <div class="nav-logo">CM</div>
+    <span class="nav-brand">Change Management Platform</span>
   </div>
   <div class="nav-right">
+    <div class="nav-project" id="nav-project"></div>
     <span class="save-indicator" id="save-indicator">—</span>
-    <div class="nav-unit">Unit 5 of 5</div>
   </div>
 </nav>
 
+<div class="project-strip"><div id="cmt-strip-inner"></div></div>
+
+<div class="app-layout">
+<div id="cmt-sidebar-mount"></div>
+<div class="unit-main">
+
 <div class="tabbar">
-  <button class="tab-btn active" onclick="switchTab('adoption',this)"><span class="tab-num">1</span> Adoption Map</button>
-  <button class="tab-btn" onclick="switchTab('nudges',this)"><span class="tab-num">2</span> Nudge Plan</button>
-  <button class="tab-btn" onclick="switchTab('momentum',this)"><span class="tab-num">3</span> Momentum</button>
-  <button class="tab-btn" onclick="switchTab('ai',this)"><span class="tab-num">4</span> AI &amp; Export</button>
+  <button class="tab-btn active" onclick="switchTab('adoption',this)">Adoption Map</button>
+  <button class="tab-btn" onclick="switchTab('nudges',this)">Nudge Plan</button>
+  <button class="tab-btn" onclick="switchTab('momentum',this)">Momentum</button>
+  <button class="tab-btn" onclick="switchTab('ai',this)">AI &amp; Export</button>
 </div>
 
 <div class="workspace"><div class="content">
@@ -217,9 +217,6 @@ nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items
     <div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;">Add stakeholders in Unit 3 to populate the adoption map.</div>
   </div>
 
-  <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
-    <button class="btn btn-primary" onclick="switchTab('nudges',document.querySelectorAll('.tab-btn')[1])">Nudge Plan →</button>
-  </div>
 </div>
 </div>
 
@@ -260,10 +257,6 @@ nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items
   </div>
   <button class="btn btn-secondary btn-sm" onclick="addNudge()">+ Add nudge</button>
 
-  <div style="display:flex;justify-content:space-between;margin-top:1.5rem;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn btn-secondary" onclick="switchTab('adoption',document.querySelectorAll('.tab-btn')[0])">← Adoption Map</button>
-    <button class="btn btn-primary" onclick="switchTab('momentum',document.querySelectorAll('.tab-btn')[2])">Momentum →</button>
-  </div>
 </div>
 </div>
 
@@ -299,10 +292,6 @@ nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items
     <textarea class="field-textarea" id="momentum-tipping" placeholder="If this happened, it would significantly shift the momentum of this change…" oninput="autosave()"></textarea>
   </div>
 
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-    <button class="btn btn-secondary" onclick="switchTab('nudges',document.querySelectorAll('.tab-btn')[1])">← Nudge Plan</button>
-    <button class="btn btn-primary" onclick="switchTab('ai',document.querySelectorAll('.tab-btn')[3])">AI &amp; Export →</button>
-  </div>
 </div>
 </div>
 
@@ -352,16 +341,20 @@ nav{background:var(--navy);height:52px;padding:0 1.5rem;display:flex;align-items
     <div class="complete-title">You have completed the full change journey.</div>
     <div class="complete-sub">Vision → Forces → Stakeholders → Communication → Momentum.<br>Your change case is now a living document. Return to any unit as the situation evolves.</div>
     <div class="complete-actions">
-      <a href="index.html" class="btn btn-primary">Back to Projects</a>
       <button class="btn btn-secondary" onclick="exportProject()">Export as JSON</button>
     </div>
   </div>
 </div>
 </div>
 
-</div></div>
+</div></div><!-- /content /workspace -->
+
+</div><!-- /unit-main -->
+</div><!-- /app-layout -->
+
 <div class="toast" id="toast"></div>
 
+<script src="cmt-sidebar.js"></script>
 <script>
 'use strict';
 
