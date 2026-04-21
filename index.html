@@ -218,6 +218,21 @@ body { height: auto; overflow: auto; min-height: 100vh; display: block; backgrou
 .stage-unit_5   { background: var(--u5-lt); color: var(--u5); }
 .stage-complete { background: var(--ok-lt); color: var(--ok); }
 
+/* Demo badge — subtle chip on seeded example projects */
+.demo-chip {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background: var(--g-100);
+  color: var(--g-00);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 /* Empty state */
 .projects-empty {
   background: var(--surface);
@@ -565,7 +580,7 @@ function renderProjectCard(p) {
   return '<div class="project-card" onclick="openProject(\'' + p.id + '\')">'
     + '<div class="project-card-main">'
     +   (p.organization ? '<div class="project-card-org">' + esc(p.organization) + '</div>' : '')
-    +   '<div class="project-card-title">' + esc(p.title) + '</div>'
+    +   '<div class="project-card-title">' + esc(p.title) + (p.is_demo ? '<span class="demo-chip">Demo</span>' : '') + '</div>'
     +   (p.summary ? '<div class="project-card-summary">' + esc(p.summary) + '</div>' : '')
     +   '<div class="project-card-meta">'
     +     '<div class="progress-track">' + segs + '</div>'
@@ -575,7 +590,9 @@ function renderProjectCard(p) {
     + '</div>'
     + '<div class="project-card-actions" onclick="event.stopPropagation()">'
     +   '<span class="stage-badge stage-' + p.stage + '">' + (STAGE_LABELS[p.stage] || 'Unit 1') + '</span>'
-    +   '<button class="btn btn-sm btn-ghost" onclick="promptDelete(\'' + p.id + '\')">Delete</button>'
+    +   (p.is_demo
+        ? ''
+        : '<button class="btn btn-sm btn-ghost" onclick="promptDelete(\'' + p.id + '\')">Delete</button>')
     + '</div>'
     + '</div>';
 }
