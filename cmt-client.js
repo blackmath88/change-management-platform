@@ -31,6 +31,10 @@ const CMT = (() => {
   const SB_URL = 'https://rikjyomeaguntynhlqwb.supabase.co';
   const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpa2p5b21lYWd1bnR5bmhscXdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTUzMTgsImV4cCI6MjA5MTYzMTMxOH0.Ly0fe9szBilaDt0uPYOT1EiFqfI7V7iStJAXCP8h7v8';
 
+  // Projects owned by this session_token are visible to ALL users as demo content.
+  // Seeded via seed-swiss-demo-cases.sql. Editable — re-run the SQL to restore.
+  const DEMO_TOKEN = 'demo-swiss-policy-2026';
+
   const BASE_HEADERS = {
     'Content-Type':  'application/json',
     'apikey':        SB_KEY,
@@ -91,10 +95,14 @@ const CMT = (() => {
 
   async function getProjects() {
     const token = getSessionToken();
+    // Fetch projects matching either the user's token OR the demo token.
+    // PostgREST `or=(...)` syntax. Demo projects show up for every visitor.
+    const filter = `or=(session_token.eq.${encodeURIComponent(token)},session_token.eq.${encodeURIComponent(DEMO_TOKEN)})`;
     const rows = await req(
-      `projects?session_token=eq.${encodeURIComponent(token)}&order=updated_at.desc&select=*`
+      `projects?${filter}&order=updated_at.desc&select=*`
     );
-    return rows || [];
+    // Mark demo rows so the UI can render them differently.
+    return (rows || []).map(r => ({ ...r, is_demo: r.session_token === DEMO_TOKEN }));
   }
 
   async function getProject(id) {
@@ -239,6 +247,7 @@ const CMT = (() => {
 
   // ── PUBLIC API ────────────────────────────────────────────
   return {
+    DEMO_TOKEN,
     getSessionToken, getCurrentProjectId, setCurrentProjectId,
     getProjects, getProject, createProject, updateProject, deleteProject,
     saveModule, loadModule, loadAllModules,
