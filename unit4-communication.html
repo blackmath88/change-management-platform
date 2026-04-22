@@ -372,6 +372,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="cmt-client.js"></script>
 <script src="cmt-sidebar.js"></script>
 <script>
 'use strict';
@@ -400,30 +401,35 @@ let data = {
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
-function init() {
+async function init() {
   const params = new URLSearchParams(window.location.search);
   projectId = params.get('project') || localStorage.getItem('cmt_current_project');
 
-  const vRaw = localStorage.getItem('cmt_module_' + projectId + '_vision');
-  if (vRaw) {
-    vision = JSON.parse(vRaw);
-    const vtext = vision.vision_statement || vision.ctx_title;
-    if (vtext) {
-      document.getElementById('vision-carry-text').textContent = vtext;
-      document.getElementById('vision-carry').style.display = 'block';
-    }
-    if (vision.ctx_title) document.getElementById('topbar-project').textContent = vision.ctx_title;
-    if (vision.ctx_org) {
-      document.getElementById('topbar-org').textContent = vision.ctx_org;
-      document.getElementById('topbar-sep').style.display = 'inline';
-    }
+  try {
+    const allModules = await CMT.loadAllModules(projectId);
+    if (allModules.vision) vision = allModules.vision;
+    if (allModules.stakeholders) stakeholdersData = allModules.stakeholders;
+    if (allModules.communication) data = { ...data, ...allModules.communication };
+  } catch(e) {
+    console.warn('Failed to load from Supabase, using localStorage', e);
+    const vRaw = localStorage.getItem('cmt_module_' + projectId + '_vision');
+    if (vRaw) { try { vision = JSON.parse(vRaw); } catch(e) {} }
+    const shRaw = localStorage.getItem('cmt_module_' + projectId + '_stakeholders');
+    if (shRaw) { try { stakeholdersData = JSON.parse(shRaw); } catch(e) {} }
+    const saved = localStorage.getItem('cmt_module_' + projectId + '_communication');
+    if (saved) { try { data = { ...data, ...JSON.parse(saved) }; } catch(e) {} }
   }
 
-  const shRaw = localStorage.getItem('cmt_module_' + projectId + '_stakeholders');
-  if (shRaw) stakeholdersData = JSON.parse(shRaw);
-
-  const saved = localStorage.getItem('cmt_module_' + projectId + '_communication');
-  if (saved) { try { data = { ...data, ...JSON.parse(saved) }; } catch(e) {} }
+  const vtext = vision.vision_statement || vision.ctx_title;
+  if (vtext) {
+    document.getElementById('vision-carry-text').textContent = vtext;
+    document.getElementById('vision-carry').style.display = 'block';
+  }
+  if (vision.ctx_title) document.getElementById('topbar-project').textContent = vision.ctx_title;
+  if (vision.ctx_org) {
+    document.getElementById('topbar-org').textContent = vision.ctx_org;
+    document.getElementById('topbar-sep').style.display = 'inline';
+  }
 
   setField('core-problem', data.core_problem);
   setField('core-solution', data.core_solution);
@@ -522,8 +528,13 @@ function autosave() {
   const ind = document.getElementById('save-indicator');
   ind.textContent = 'Saving'; ind.className = 'save-indicator saving';
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    localStorage.setItem('cmt_module_' + projectId + '_communication', JSON.stringify(data));
+  saveTimer = setTimeout(async () => {
+    try {
+      await CMT.saveModule(projectId, 'communication', data);
+    } catch(e) {
+      console.warn('Supabase save failed, using localStorage fallback', e);
+      localStorage.setItem('cmt_module_' + projectId + '_communication', JSON.stringify(data));
+    }
     if (window.CMTSidebar) window.CMTSidebar.refresh();
     ind.textContent = 'Saved'; ind.className = 'save-indicator saved';
     setTimeout(() => { ind.textContent = '—'; ind.className = 'save-indicator'; }, 2000);
@@ -579,7 +590,7 @@ function val(id) { const el = document.getElementById(id); return el ? el.value.
 function setField(id, v) { const el = document.getElementById(id); if (el && v) el.value = v; }
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-init();
+(async () => { await init(); })();
 </script>
 </body>
 </html>
