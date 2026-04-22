@@ -454,6 +454,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="cmt-client.js"></script>
 <script src="cmt-sidebar.js"></script>
 <script>
 'use strict';
@@ -468,32 +469,36 @@ let data = { stakeholders: [] };
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
-function init() {
+async function init() {
   const params = new URLSearchParams(window.location.search);
   projectId = params.get('project') || localStorage.getItem('cmt_current_project');
 
-  const vRaw = localStorage.getItem('cmt_module_' + projectId + '_vision');
-  if (vRaw) {
-    vision = JSON.parse(vRaw);
-    if (vision.ctx_title) document.getElementById('topbar-project').textContent = vision.ctx_title;
-    if (vision.ctx_org) {
-      document.getElementById('topbar-org').textContent = vision.ctx_org;
-      document.getElementById('topbar-sep').style.display = 'inline';
-    }
+  try {
+    const allModules = await CMT.loadAllModules(projectId);
+    if (allModules.vision) vision = allModules.vision;
+    if (allModules.forces) forces = allModules.forces;
+    if (allModules.stakeholders) data = allModules.stakeholders;
+  } catch(e) {
+    console.warn('Failed to load from Supabase, using localStorage', e);
+    const vRaw = localStorage.getItem('cmt_module_' + projectId + '_vision');
+    if (vRaw) { try { vision = JSON.parse(vRaw); } catch(e) {} }
+    const fRaw = localStorage.getItem('cmt_module_' + projectId + '_forces');
+    if (fRaw) { try { forces = JSON.parse(fRaw); } catch(e) {} }
+    const saved = localStorage.getItem('cmt_module_' + projectId + '_stakeholders');
+    if (saved) { try { data = JSON.parse(saved); } catch(e) {} }
   }
 
-  const fRaw = localStorage.getItem('cmt_module_' + projectId + '_forces');
-  if (fRaw) {
-    forces = JSON.parse(fRaw);
-    const topRes = (forces.resisting || []).sort((a, b) => b.strength - a.strength).slice(0, 3).map(f => f.label).filter(Boolean);
-    if (topRes.length) {
-      document.getElementById('forces-carry-text').textContent = 'Top restraining forces: ' + topRes.join(' · ');
-      document.getElementById('forces-carry').style.display = 'block';
-    }
+  if (vision.ctx_title) document.getElementById('topbar-project').textContent = vision.ctx_title;
+  if (vision.ctx_org) {
+    document.getElementById('topbar-org').textContent = vision.ctx_org;
+    document.getElementById('topbar-sep').style.display = 'inline';
   }
 
-  const saved = localStorage.getItem('cmt_module_' + projectId + '_stakeholders');
-  if (saved) { try { data = JSON.parse(saved); } catch(e) {} }
+  const topRes = (forces.resisting || []).sort((a, b) => b.strength - a.strength).slice(0, 3).map(f => f.label).filter(Boolean);
+  if (topRes.length) {
+    document.getElementById('forces-carry-text').textContent = 'Top restraining forces: ' + topRes.join(' · ');
+    document.getElementById('forces-carry').style.display = 'block';
+  }
 
   renderInnerSidebar();
   renderTable();
@@ -669,8 +674,13 @@ function autosave() {
   const ind = document.getElementById('save-indicator');
   ind.textContent = 'Saving'; ind.className = 'save-indicator saving';
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    localStorage.setItem('cmt_module_' + projectId + '_stakeholders', JSON.stringify(data));
+  saveTimer = setTimeout(async () => {
+    try {
+      await CMT.saveModule(projectId, 'stakeholders', data);
+    } catch(e) {
+      console.warn('Supabase save failed, using localStorage fallback', e);
+      localStorage.setItem('cmt_module_' + projectId + '_stakeholders', JSON.stringify(data));
+    }
     if (window.CMTSidebar) window.CMTSidebar.refresh();
     ind.textContent = 'Saved'; ind.className = 'save-indicator saved';
     setTimeout(() => { ind.textContent = '—'; ind.className = 'save-indicator'; }, 2000);
@@ -716,7 +726,7 @@ function copyPrompt(btn) {
 function softCopy() { navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).catch(() => {}); }
 function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-init();
+(async () => { await init(); })();
 </script>
 </body>
 </html>
